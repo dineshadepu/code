@@ -1,4 +1,4 @@
-"""Water rested in a vessel
+"""Water rested in a vessel:: A Hydrostatic tank (30 minutes)
 
 Check basic equations of SPH to throw a ball inside the vessel
 """
@@ -23,6 +23,8 @@ from pysph.solver.application import Application
 
 from GeomSPH.geometry import get_tank, get_fluid
 
+dim = 3
+
 
 def add_properties(pa, *props):
     for prop in props:
@@ -44,39 +46,41 @@ class FluidStructureInteration(Application):
         # xf, yf = create_fluid_with_solid_cube()
 
         tank1 = get_tank(length=140 * 1e-3, breadth=140 * 1e-3,
-                         height=0, spacing=1 * 1e-3, layers=2, dim=2)
+                         height=140 * 1e-3, spacing=2 * 1e-3, layers=2,
+                         dim=dim)
         xt, yt, zt = tank1.get_xyz()
         ut = np.zeros_like(xt)
         vt = np.zeros_like(xt)
         wt = np.zeros_like(xt)
-        m = np.ones_like(xt) * 1500 * tank1.spacing**2
+        m = np.ones_like(xt) * 1500 * tank1.spacing**dim
         rho = np.ones_like(xt) * 1000
         h = np.ones_like(xt) * self.hdx * tank1.spacing
-        tank = get_particle_array_wcsph(x=xt, y=yt, h=h, m=m, rho=rho, u=ut,
-                                        v=vt, w=wt, name="tank")
-        fluid1 = get_fluid(length=140 * 1e-3, breadth=110 * 1e-3, height=0,
-                           spacing=2 * 1e-3, dim=2)
+        tank = get_particle_array_wcsph(x=xt, y=yt, z=zt, h=h, m=m, rho=rho,
+                                        u=ut, v=vt, w=wt, name="tank")
+        fluid1 = get_fluid(length=140 * 1e-3, breadth=140 * 1e-3,
+                           height=100 * 1e-3, spacing=3 * 1e-3, dim=dim)
         fluid1.trim_tank(tank1)
         xf, yf, zf = fluid1.get_xyz()
         uf = np.zeros_like(xf)
         vf = np.zeros_like(xf)
+        wf = np.zeros_like(xf)
         rho = np.ones_like(xf) * 1000
-        m = np.ones_like(xf) * fluid1.spacing**2 * 1000
+        m = np.ones_like(xf) * fluid1.spacing**dim * 1000
         h = np.ones_like(xf) * self.hdx * fluid1.spacing
-        fluid = get_particle_array_wcsph(x=xf, y=yf, h=h, m=m, rho=rho, u=uf,
-                                         v=vf, name="fluid")
+        fluid = get_particle_array_wcsph(x=xf, y=yf, z=zf, h=h, m=m, rho=rho,
+                                         u=uf, v=vf, w=wf, name="fluid")
 
         return [fluid, tank]
 
     def create_solver(self):
-        kernel = CubicSpline(dim=2)
+        kernel = CubicSpline(dim=dim)
 
         integrator = EPECIntegrator(fluid=WCSPHStep(), tank=WCSPHStep())
 
-        dt = 0.125 * self.dx * self.hdx / (self.co * 1.1) / 2.
+        dt = 1e-4
         print("DT: %s" % dt)
-        tf = 0.5
-        solver = Solver(kernel=kernel, dim=2, integrator=integrator, dt=dt,
+        tf = 0.1
+        solver = Solver(kernel=kernel, dim=dim, integrator=integrator, dt=dt,
                         tf=tf, adaptive_timestep=False)
 
         return solver
@@ -98,7 +102,7 @@ class FluidStructureInteration(Application):
                     sources=['fluid', 'tank'], ),
                 MomentumEquation(dest='fluid', sources=['fluid', 'tank'],
                                  alpha=self.alpha, beta=0.0, c0=self.co,
-                                 gy=-9.81),
+                                 gz=-9.81),
                 XSPHCorrection(dest='fluid', sources=['fluid', 'tank']),
             ]),
         ]
