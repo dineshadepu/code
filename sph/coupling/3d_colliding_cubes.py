@@ -1,0 +1,124 @@
+"""Water rested in a vessel
+
+Check basic equations of SPH to throw a ball inside the vessel
+"""
+from __future__ import print_function
+import numpy as np
+import matplotlib.pyplot as plt
+
+# PySPH base and carray imports
+from pysph.base.utils import get_particle_array_wcsph
+from pysph.base.kernels import CubicSpline
+
+from pysph.solver.solver import Solver
+from pysph.sph.integrator import EPECIntegrator
+from pysph.sph.integrator_step import WCSPHStep
+
+from pysph.sph.equation import Group
+from pysph.sph.basic_equations import (
+    XSPHCorrection,
+    ContinuityEquation, )
+from pysph.sph.wc.basic import TaitEOS, MomentumEquation
+from pysph.solver.application import Application
+
+from GeomSPH.geometry import get_tank, get_fluid
+
+
+def add_properties(pa, *props):
+    for prop in props:
+        pa.add_property(name=prop)
+
+
+class FluidStructureInteration(Application):
+    def initialize(self):
+        self.dx = 2 * 1e-3
+        self.hdx = 1.2
+        self.ro = 1000
+        self.co = 2 * np.sqrt(2 * 9.81 * 130 * 1e-3)
+        self.alpha = 0.1
+
+    def create_particles(self):
+        # get both particle array positions
+        # xf, yf, zf, xt, yt, zt = create_hydrostatic_tank(1, 1, 1, 0.01, 2)
+        """Create the circular patch of fluid."""
+        # xf, yf = create_fluid_with_solid_cube()
+
+        tank1 = get_tank(length=140 * 1e-3, breadth=140 * 1e-3,
+                         height=0, spacing=1 * 1e-3, layers=2, dim=2)
+        xt, yt, zt = tank1.get_xyz()
+        ut = np.zeros_like(xt)
+        vt = np.zeros_like(xt)
+        wt = np.zeros_like(xt)
+        m = np.ones_like(xt) * 1500 * tank1.spacing**2
+        rho = np.ones_like(xt) * 1000
+        h = np.ones_like(xt) * self.hdx * tank1.spacing
+        tank = get_particle_array_wcsph(x=xt, y=yt, h=h, m=m, rho=rho, u=ut,
+                                        v=vt, w=wt, name="tank")
+        fluid1 = get_fluid(length=140 * 1e-3, breadth=110 * 1e-3, height=0,
+                           spacing=2 * 1e-3, dim=2)
+        fluid1.trim_tank(tank1)
+        xf, yf, zf = fluid1.get_xyz()
+        uf = np.zeros_like(xf)
+        vf = np.zeros_like(xf)
+        rho = np.ones_like(xf) * 1000
+        m = np.ones_like(xf) * fluid1.spacing**2 * 1000
+        h = np.ones_like(xf) * self.hdx * fluid1.spacing
+        fluid = get_particle_array_wcsph(x=xf, y=yf, h=h, m=m, rho=rho, u=uf,
+                                         v=vf, name="fluid")
+
+        return [fluid, tank]
+
+    def create_solver(self):
+        kernel = CubicSpline(dim=2)
+
+        integrator = EPECIntegrator(fluid=WCSPHStep(), tank=WCSPHStep())
+
+        dt = 0.125 * self.dx * self.hdx / (self.co * 1.1) / 2.
+        print("DT: %s" % dt)
+        tf = 0.5
+        solver = Solver(kernel=kernel, dim=2, integrator=integrator, dt=dt,
+                        tf=tf, adaptive_timestep=False)
+
+        return solver
+
+    def create_equations(self):
+        equations = [
+            Group(equations=[
+                TaitEOS(dest='fluid', sources=None, rho0=self.ro, c0=self.co,
+                        gamma=7.0),
+                TaitEOS(dest='tank', sources=None, rho0=self.ro, c0=self.co,
+                        gamma=7.0),
+            ], real=False),
+            Group(equations=[
+                ContinuityEquation(
+                    dest='fluid',
+                    sources=['fluid', 'tank'], ),
+                ContinuityEquation(
+                    dest='tank',
+                    sources=['fluid', 'tank'], ),
+                MomentumEquation(dest='fluid', sources=['fluid', 'tank'],
+                                 alpha=self.alpha, beta=0.0, c0=self.co,
+                                 gy=-9.81),
+                XSPHCorrection(dest='fluid', sources=['fluid', 'tank']),
+            ]),
+        ]
+        return equations
+
+
+if __name__ == '__main__':
+    app = FluidStructureInteration()
+    app.run()
+    # x, y = create_fluid()
+    # xt, yt = create_boundary(1 * 1e-3)
+    # plt.scatter(xt, yt)
+    # plt.scatter(x, y)
+    # plt.axes().set_aspect('equal', 'datalim')
+    # plt.show()
+    # xt, yt = create_boundary(1 * 1e-3)
+    # xc, yc, indices = create_cube()
+    # xf, yf = create_fluid_with_solid_cube()
+    # plt.scatter(xt, yt)
+    # plt.scatter(xc, yc)
+    # plt.scatter(xf, yf)
+    # plt.axes().set_aspect('equal', 'datalim')
+    # plt.show()
