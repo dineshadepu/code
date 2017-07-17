@@ -117,24 +117,39 @@ class FluidStructureInteration(Application):
 
     def create_equations(self):
         equations = [
+            Group(
+                equations=[
+                    BodyForce(dest='cube', sources=None, gy=-9.81),
+                    SummationDensity(dest='cube', sources=['fluid', 'cube']),
+                ],
+                real=False),
             Group(equations=[
                 TaitEOS(dest='fluid', sources=None, rho0=self.ro, c0=self.co,
                         gamma=7.0),
                 TaitEOS(dest='tank', sources=None, rho0=self.ro, c0=self.co,
                         gamma=7.0),
+                TaitEOSHGCorrection(dest='cube', sources=None,
+                                    rho0=self.solid_rho, c0=self.co,
+                                    gamma=7.0),
             ], real=False),
             Group(equations=[
                 ContinuityEquation(
                     dest='fluid',
-                    sources=['fluid', 'tank'], ),
+                    sources=['fluid', 'tank', 'cube'], ),
                 ContinuityEquation(
                     dest='tank',
-                    sources=['fluid', 'tank'], ),
+                    sources=['fluid', 'tank', 'cube'], ),
                 MomentumEquation(dest='fluid', sources=['fluid', 'tank'],
                                  alpha=self.alpha, beta=0.0, c0=self.co,
                                  gz=-9.81),
                 XSPHCorrection(dest='fluid', sources=['fluid', 'tank']),
             ]),
+            Group(equations=[
+                RigidBodyCollision(dest='cube', sources=['tank'],
+                                   kn=1e6)
+            ]),
+            Group(equations=[RigidBodyMoments(dest='cube', sources=None)]),
+            Group(equations=[RigidBodyMotion(dest='cube', sources=None)]),
         ]
         return equations
 
