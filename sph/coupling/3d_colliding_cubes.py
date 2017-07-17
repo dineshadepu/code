@@ -7,7 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # PySPH base and carray imports
-from pysph.base.utils import get_particle_array_wcsph
+from pysph.base.utils import (get_particle_array_wcsph,
+                              get_particle_array_rigid_body)
 from pysph.base.kernels import CubicSpline
 
 from pysph.solver.solver import Solver
@@ -20,6 +21,14 @@ from pysph.sph.basic_equations import (
     ContinuityEquation, )
 from pysph.sph.wc.basic import TaitEOS, MomentumEquation
 from pysph.solver.application import Application
+
+from pysph.sph.rigid_body import (
+    BodyForce,
+    RigidBodyCollision,
+    LiuFluidForce,
+    RigidBodyMoments,
+    RigidBodyMotion,
+    RK2StepRigidBody, )
 
 from GeomSPH.geometry import get_tank, get_fluid, get_cube
 
@@ -55,8 +64,10 @@ class FluidStructureInteration(Application):
         m = np.ones_like(xt) * 1500 * tank1.spacing**dim
         rho = np.ones_like(xt) * 1000
         h = np.ones_like(xt) * self.hdx * tank1.spacing
+        rad_s = np.ones_like(xt) * tank1.spacing
         tank = get_particle_array_wcsph(x=xt, y=yt, z=zt, h=h, m=m, rho=rho,
-                                        u=ut, v=vt, w=wt, name="tank")
+                                        u=ut, v=vt, w=wt, rad_s=rad_s,
+                                        name="tank")
         fluid1 = get_fluid(length=140 * 1e-3, breadth=140 * 1e-3,
                            height=100 * 1e-3, spacing=6 * 1e-3, dim=dim)
         fluid1.trim_tank(tank1)
@@ -70,9 +81,9 @@ class FluidStructureInteration(Application):
         fluid = get_particle_array_wcsph(x=xf, y=yf, z=zf, h=h, m=m, rho=rho,
                                          u=uf, v=vf, w=wf, name="fluid")
 
-        cube1 = get_cube(length=20 * 1e-3, breadth=20 * 1e-3, height=20*1e-3,
+        cube1 = get_cube(length=20 * 1e-3, breadth=20 * 1e-3, height=20 * 1e-3,
                          spacing=4 * 1e-3, left=(60 * 1e-3, 60 * 1e-3,
-                                                 100*1e-3), dim=dim)
+                                                 100 * 1e-3), dim=dim)
         xb, yb, zb = cube1.get_xyz()
         ub = np.zeros_like(xb)
         vb = np.zeros_like(xb)
@@ -80,14 +91,18 @@ class FluidStructureInteration(Application):
         rho = np.ones_like(xb) * 1500
         m = np.ones_like(xb) * cube1.spacing**dim * 1500
         h = np.ones_like(xb) * self.hdx * cube1.spacing
-        cube = get_particle_array_wcsph(x=xb, y=yb, z=zb, h=h, m=m, rho=rho,
-                                        u=ub, v=vb, w=wb, name="cube")
+        cs = np.zeros_like(xb)
+        rad_s = np.ones_like(xb) * cube1.spacing
+        cube = get_particle_array_rigid_body(x=xb, y=yb, z=zb, h=h, m=m,
+                                             rho=rho, rad_s=rad_s, cs=cs, u=ub,
+                                             v=vb, w=wb, name="cube")
         return [fluid, tank, cube]
 
     def create_solver(self):
         kernel = CubicSpline(dim=dim)
 
-        integrator = EPECIntegrator(fluid=WCSPHStep(), tank=WCSPHStep())
+        integrator = EPECIntegrator(fluid=WCSPHStep(), tank=WCSPHStep(),
+                                    cube=RK2StepRigidBody())
 
         dt = 1e-4
         print("DT: %s" % dt)
