@@ -18,8 +18,10 @@ from pysph.sph.integrator_step import WCSPHStep
 from pysph.sph.equation import Group
 from pysph.sph.basic_equations import (
     XSPHCorrection,
-    ContinuityEquation, )
+    ContinuityEquation,
+    SummationDensity)
 from pysph.sph.wc.basic import TaitEOS, MomentumEquation
+from pysph.sph.wc.basic import TaitEOSHGCorrection
 from pysph.solver.application import Application
 
 from pysph.sph.rigid_body import (
@@ -47,6 +49,7 @@ class FluidStructureInteration(Application):
         self.ro = 1000
         self.co = 2 * np.sqrt(2 * 9.81 * 130 * 1e-3)
         self.alpha = 0.1
+        self.solid_rho = 1500
 
     def create_particles(self):
         # get both particle array positions
@@ -88,8 +91,8 @@ class FluidStructureInteration(Application):
         ub = np.zeros_like(xb)
         vb = np.zeros_like(xb)
         wb = np.zeros_like(xb)
-        rho = np.ones_like(xb) * 1500
-        m = np.ones_like(xb) * cube1.spacing**dim * 1500
+        rho = np.ones_like(xb) * self.solid_rho
+        m = np.ones_like(xb) * cube1.spacing**dim * self.solid_rho
         h = np.ones_like(xb) * self.hdx * cube1.spacing
         cs = np.zeros_like(xb)
         rad_s = np.ones_like(xb) * cube1.spacing
