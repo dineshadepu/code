@@ -21,7 +21,7 @@ from pysph.sph.basic_equations import (
 from pysph.sph.wc.basic import TaitEOS, MomentumEquation
 from pysph.solver.application import Application
 
-from GeomSPH.geometry import get_tank, get_fluid
+from GeomSPH.geometry import get_tank, get_fluid, get_cube
 
 dim = 3
 
@@ -46,7 +46,7 @@ class FluidStructureInteration(Application):
         # xf, yf = create_fluid_with_solid_cube()
 
         tank1 = get_tank(length=140 * 1e-3, breadth=140 * 1e-3,
-                         height=140 * 1e-3, spacing=2 * 1e-3, layers=2,
+                         height=140 * 1e-3, spacing=4 * 1e-3, layers=2,
                          dim=dim)
         xt, yt, zt = tank1.get_xyz()
         ut = np.zeros_like(xt)
@@ -58,7 +58,7 @@ class FluidStructureInteration(Application):
         tank = get_particle_array_wcsph(x=xt, y=yt, z=zt, h=h, m=m, rho=rho,
                                         u=ut, v=vt, w=wt, name="tank")
         fluid1 = get_fluid(length=140 * 1e-3, breadth=140 * 1e-3,
-                           height=100 * 1e-3, spacing=3 * 1e-3, dim=dim)
+                           height=100 * 1e-3, spacing=6 * 1e-3, dim=dim)
         fluid1.trim_tank(tank1)
         xf, yf, zf = fluid1.get_xyz()
         uf = np.zeros_like(xf)
@@ -70,7 +70,19 @@ class FluidStructureInteration(Application):
         fluid = get_particle_array_wcsph(x=xf, y=yf, z=zf, h=h, m=m, rho=rho,
                                          u=uf, v=vf, w=wf, name="fluid")
 
-        return [fluid, tank]
+        cube1 = get_cube(length=20 * 1e-3, breadth=20 * 1e-3, height=20*1e-3,
+                         spacing=4 * 1e-3, left=(60 * 1e-3, 60 * 1e-3,
+                                                 100*1e-3), dim=dim)
+        xb, yb, zb = cube1.get_xyz()
+        ub = np.zeros_like(xb)
+        vb = np.zeros_like(xb)
+        wb = np.zeros_like(xb)
+        rho = np.ones_like(xb) * 1500
+        m = np.ones_like(xb) * cube1.spacing**dim * 1500
+        h = np.ones_like(xb) * self.hdx * cube1.spacing
+        cube = get_particle_array_wcsph(x=xb, y=yb, z=zb, h=h, m=m, rho=rho,
+                                        u=ub, v=vb, w=wb, name="cube")
+        return [fluid, tank, cube]
 
     def create_solver(self):
         kernel = CubicSpline(dim=dim)
