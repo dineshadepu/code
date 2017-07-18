@@ -1,0 +1,8 @@
+#+TITLE: Useful day to day links are uploaded here
+#+AUTHOR: Dinesh A
+#+DATE:
+#+OPTIONS: toc:nil H:3 num:2
+#+STARTUP: showeverything
+
+*** Yasnippets org mode
+    Here is a better folder for org mode in Emacs [[git@github.com:yyr/yasnippets-orgmode.git]]
