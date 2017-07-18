@@ -58,7 +58,7 @@ class FluidStructureInteration(Application):
         # xf, yf = create_fluid_with_solid_cube()
 
         tank1 = get_tank(length=140 * 1e-3, breadth=140 * 1e-3,
-                         height=140 * 1e-3, spacing=4 * 1e-3, layers=2,
+                         height=140 * 1e-3, spacing=3 * 1e-3, layers=2,
                          dim=dim)
         xt, yt, zt = tank1.get_xyz()
         ut = np.zeros_like(xt)
@@ -67,7 +67,7 @@ class FluidStructureInteration(Application):
         m = np.ones_like(xt) * 1500 * tank1.spacing**dim
         rho = np.ones_like(xt) * 1000
         h = np.ones_like(xt) * self.hdx * tank1.spacing
-        rad_s = np.ones_like(xt) * tank1.spacing
+        rad_s = np.ones_like(xt) * tank1.spacing / 2.0
         tank = get_particle_array_wcsph(x=xt, y=yt, z=zt, h=h, m=m, rho=rho,
                                         u=ut, v=vt, w=wt, rad_s=rad_s,
                                         name="tank")
@@ -85,7 +85,7 @@ class FluidStructureInteration(Application):
                                          u=uf, v=vf, w=wf, name="fluid")
 
         cube1 = get_cube(length=20 * 1e-3, breadth=20 * 1e-3, height=20 * 1e-3,
-                         spacing=4 * 1e-3, left=(60 * 1e-3, 60 * 1e-3,
+                         spacing=3 * 1e-3, left=(60 * 1e-3, 60 * 1e-3,
                                                  100 * 1e-3), dim=dim)
         xb, yb, zb = cube1.get_xyz()
         ub = np.zeros_like(xb)
@@ -95,7 +95,7 @@ class FluidStructureInteration(Application):
         m = np.ones_like(xb) * cube1.spacing**dim * self.solid_rho
         h = np.ones_like(xb) * self.hdx * cube1.spacing
         cs = np.zeros_like(xb)
-        rad_s = np.ones_like(xb) * cube1.spacing
+        rad_s = np.ones_like(xb) * cube1.spacing / 2.0
         cube = get_particle_array_rigid_body(x=xb, y=yb, z=zb, h=h, m=m,
                                              rho=rho, rad_s=rad_s, cs=cs, u=ub,
                                              v=vb, w=wb, name="cube")
@@ -107,9 +107,9 @@ class FluidStructureInteration(Application):
         integrator = EPECIntegrator(fluid=WCSPHStep(), tank=WCSPHStep(),
                                     cube=RK2StepRigidBody())
 
-        dt = 1e-4
+        dt = 1e-5 * 5
         print("DT: %s" % dt)
-        tf = 0.1
+        tf = 1
         solver = Solver(kernel=kernel, dim=dim, integrator=integrator, dt=dt,
                         tf=tf, adaptive_timestep=False)
 
@@ -119,7 +119,7 @@ class FluidStructureInteration(Application):
         equations = [
             Group(
                 equations=[
-                    BodyForce(dest='cube', sources=None, gy=-9.81),
+                    BodyForce(dest='cube', sources=None, gz=-9.81),
                     SummationDensity(dest='cube', sources=['fluid', 'cube']),
                 ],
                 real=False),
@@ -146,7 +146,7 @@ class FluidStructureInteration(Application):
             ]),
             Group(equations=[
                 RigidBodyCollision(dest='cube', sources=['tank'],
-                                   kn=1e6)
+                                   kn=1e4)
             ]),
             Group(equations=[RigidBodyMoments(dest='cube', sources=None)]),
             Group(equations=[RigidBodyMotion(dest='cube', sources=None)]),
