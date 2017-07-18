@@ -1,0 +1,35 @@
+#+TITLE: Porous flow in particle-based fluid simulations
+#+SUBTITLE: Simulation of fluid flow through a deformable material using SPH
+#+SUBTITLE: A Toolkit for Writing Reproducible Research Papers and Monographs
+#+AUTHOR: Toon Lenaerts, Bart Adams, Philip Dutré
+#+DATE: 2008 (ACM Transactions on Graphics (TOG))
+#+OPTIONS: toc:nil H:3 num:2
+#+STARTUP: showeverything
+
+
+* Abstract
+  In this paper fluid flowing through a porous deformable material is
+  simulated. Law of Darcy takes care of coupling fluid with fluid
+  medium. This is an overcome to low time step of previous
+  implementations. This predicts the deformation of wet objects under
+  fluid.
+
+* Introduction
+  Fluid-rigid [[http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.3.8713&rep=rep1&type=pdf][Carlson et al]] and fluid-deformable [[http://dl.acm.org/citation.cfm?id=1073299][GUENDELMAN et al.]],
+  animations have been done, but mainly considering that the fluid is
+  not penetrable in to the body.
+
+  In the present work SPH is used to simulate fluid-observant objects
+  and their changing behaviour. The present work is an extension to
+  of [[http://matthias-mueller-fischer.ch/publications/sca03.pdf][Muller et al. 2003]],  [[https://graphics.ethz.ch/~sobarbar/papers/Sol05/Sol05.pdf][Muller et al. 2005]],  [[https://graphics.ethz.ch/~sobarbar/papers/Sol07b/Sol07b.pdf][B. Solenthaler 2007]],
+  [[https://cg.informatik.uni-freiburg.de/publications/2007_SCA_SPH.pdf][Markus becker 2007]], by using these concepts wetting of objects can be
+  simulated.
+
+  Previous formulations are computationally very expensive and the
+  present method will use very less particles to capture the physics
+  and reflexes the same physics as the previous method.
+
+  The papers who did work on this area are
+  - [[https://www.semanticscholar.org/paper/Modelling-of-Flow-in-Porous-Media-and-Resin-Transf-SAWLEY-CLEARY/0b68cf7ec7527301532c7ad23fede2a4a354b32c][Sawley and cleary 1999]]
+  - [[http://www.sciencedirect.com/science/article/pii/S0266352X99000269][Morris 1999]]
+  - [[http://onlinelibrary.wiley.com/doi/10.1002/(SICI)1096-9853(19990810)23:9%253C881::AID-NAG996%253E3.0.CO%3B2-K/abstract][Zhu 1999]]

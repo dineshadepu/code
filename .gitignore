@@ -342,3 +342,4 @@ docs/_build/
      *.nlo
      *.un~
      *_output/
+/literatureSurvey/porousFlow/porous2008.tex
