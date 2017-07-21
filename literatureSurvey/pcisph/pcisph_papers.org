@@ -1,0 +1,4 @@
+* Predictive corrective SPH (PCISPH)
+  This method is a combination of best of WCSPH with IISPH.
+  It is introduced by [[https://graphics.ethz.ch/~sobarbar/papers/Sol09/Sol09.pdf][B. Solenthaler and R. Pajarola (University of Zurich)]].
+* Algorithm in pure python.
