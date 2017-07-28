@@ -1,0 +1,56 @@
+* These are the observations while performing PCISPH elliptical drop simulations.
+
+
+** Algorithm
+
+*** While animating
+   - Before starting a simulation do  compute density of each particle
+     and say  rho(t).  Now save  this density  value in rho0,  so that
+     comparison could be  done to scale pressure value  at a predicted
+     position.
+   - Save properties of particles at time t.
+   - Compute delta value at time t.
+
+*** While iterating:
+   - Predict the positions at t+dt.
+   - Compute density at t+dt using summation density.
+   - Find deviation using rho0 i.e., density at time t. As rho will
+     be density at t+dt in pysph.
+   - Update pressure.
+   - Now bring the particle properties back i.e, x, y, z, rho which
+     were at t+dt, should be initialised to the saved props including
+     density.
+   - These properties brought back to because the pressure force is dependent
+     on properties at time t not at time t+dt.
+   - Now compute pressure.
+   - Now again predict and correct until convergence is achieved.
+
+
+*** Note:
+   - Compute delta correctly, and see if that could get good results.
+
+
+*** Doubts:
+    - Why does rho0 and rho are equal?
+      1. If summation density is not applied before starting
+         simulation then both will e equal, and there could be any
+         difference while iterating which results in incorrect results.
+      2. Even applying summation density both density arrays are having same values
+         with zero varying density, but there is a good amount of pressure while
+         iteration. (How is this possible?)
+      3. Actually in 1. we should have so much density change and it should result in
+         too much pressure. (reasons are trivial). But it shows up zero pressure.
+
+** After many iterations
+
+   After many simulations I am able to get something for elliptical drop using
+   PCISPH.
+   - For a time step of 1e-5, and computing momentum equation at x_t,
+     y_t and rho_t, with varying delta values.
+
+
+** TODO Try a simulation with a dt of 1e-3 correct delta values.
+   Check if you need any alpha or beta values in momentum equation.
+   Check why you have a constant density every where.
+
+** TODO Implement Leap frog or RK2 method while iterating.
