@@ -387,6 +387,8 @@
   (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
 
 (add-hook 'org-mode-hook #'add-pcomplete-to-capf)
+;; this is working org mode auto completion.
+(setq company-begin-commands '(self-insert-command org-self-insert-command c-electric-lt-gt c-electric-colon))
 
 (use-package company-statistics
   :ensure t
@@ -802,6 +804,15 @@
 
 (global-set-key (kbd "C-x K") 'nuke-all-buffers)
 
+;; evil escape
+(use-package evil-escape
+  :diminish evil-escape-mode
+  :config
+  (evil-escape-mode)
+  (setq-default evil-escape-key-sequence "jk")
+  (setq-default evil-escape-delay 0.1)
+  )
+;; (require 'evil-escape-mode)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

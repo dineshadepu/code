@@ -1,5 +1,13 @@
+#+TITLE: observation
+#+DATE: <2017-07-28 Fri>
+#+AUTHOR: dinesh
+#+EMAIL: dinesh@dinesh-cfd-ubuntu
+#+STARTUP: showall
+
 * These are the observations while performing PCISPH elliptical drop simulations.
 
+
+* Algorithm for a single fluid simulation
 
 ** Algorithm
 
@@ -22,7 +30,7 @@
      density.
    - These properties brought back to because the pressure force is dependent
      on properties at time t not at time t+dt.
-   - Now compute pressure.
+   - Now compute pressure force.
    - Now again predict and correct until convergence is achieved.
 
 
@@ -33,24 +41,57 @@
 *** Doubts:
     - Why does rho0 and rho are equal?
       1. If summation density is not applied before starting
-         simulation then both will e equal, and there could be any
+         simulation then both will be equal, and there could be any
          difference while iterating which results in incorrect results.
-      2. Even applying summation density both density arrays are having same values
-         with zero varying density, but there is a good amount of pressure while
-         iteration. (How is this possible?)
-      3. Actually in 1. we should have so much density change and it should result in
-         too much pressure. (reasons are trivial). But it shows up zero pressure.
+         - I was using XSPH formulation
+      2. Even applying summation density both density arrays are
+         having same values with zero varying density, but there is a
+         good amount of pressure while iteration. (How is this
+         possible?)
+         - I was using XSPH formulation
+      3. Actually in 1. we should have so much density change and it
+         should result in too much pressure. (reasons are
+         trivial). But it shows up zero pressure.
+         - I was using XSPH formulation
 
 ** After many iterations
 
-   After many simulations I am able to get something for elliptical drop using
-   PCISPH.
+   After many simulations I am able to get something for elliptical
+   drop using PCISPH.
    - For a time step of 1e-5, and computing momentum equation at x_t,
      y_t and rho_t, with varying delta values.
 
 
-** TODO Try a simulation with a dt of 1e-3 correct delta values.
+** DONE Try a simulation with a dt of 1e-3 correct delta values.
+   CLOSED: [2017-07-31 Mon 10:22]
    Check if you need any alpha or beta values in momentum equation.
+   - Default values will be okay.
    Check why you have a constant density every where.
+   - Solved. I was using XSPH formulation.
 
 ** TODO Implement Leap frog or RK2 method while iterating.
+
+
+** Elliptical drop running simulation
+   - **Note** Results before converge method implementation
+
+   Elliptical drop behaves relatively different.
+   - While simulating elliptical drop, the following parameters are to be
+     changed to get a working output.
+   - Make max iterations=5.
+   - **Important** The delta value should be different and max should
+     not be used.
+
+** Two blocks running simulation
+   - **Note** Results before converge method implementation
+
+   Two blocks works as per pcisph algorithm.
+   - The following parameters are required while simulating TwoBlocks.
+   - Make max iterations=5.
+   - Take maximum delta for pressure update.
+
+   - tf = 1 sec
+     - While tf=1sec the simulation blows up at tf=0.9. Because
+       The particles are diverging and the density of every particle is
+       not converged. Because of which the density difference is high
+       so the pressure has high values while updating.
