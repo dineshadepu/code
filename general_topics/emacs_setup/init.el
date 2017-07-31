@@ -90,6 +90,14 @@
 ;; whitespace clean up mode
 (add-hook 'before-save-hook 'whitespace-cleanup)
 
+;; kill all oher buffers
+(defun nuke-all-buffers ()
+  (interactive)
+  (mapcar 'kill-buffer (buffer-list))
+  (delete-other-windows))
+
+(global-set-key (kbd "C-x K") 'nuke-all-buffers)
+
 ;; Copy to clipboard
 ;; (defun copy-from-osx ()
 ;;   (shell-command-to-string "pbpaste"))
@@ -298,6 +306,11 @@
   :config(progn
            (evilnc-default-hotkeys)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;; Awesome company mode configration starts here ;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package company
   :ensure t
   :defer 12
@@ -381,14 +394,14 @@
   (setq company-backends
         (mapcar #'company-mode/backend-with-yas company-backends))
   (global-company-mode))
+
+;; for org mode completion
+(setq company-begin-commands '(self-insert-command
+                               org-self-insert-command c-electric-lt-gt c-electric-colon))
+
+;;
 ;; (add-hook 'after-init-hook 'global-company-mode)
 
-(defun add-pcomplete-to-capf ()
-  (add-hook 'completion-at-point-functions 'pcomplete-completions-at-point nil t))
-
-(add-hook 'org-mode-hook #'add-pcomplete-to-capf)
-;; this is working org mode auto completion.
-(setq company-begin-commands '(self-insert-command org-self-insert-command c-electric-lt-gt c-electric-colon))
 
 (use-package company-statistics
   :ensure t
@@ -401,6 +414,14 @@
 ;;   (add-to-list 'company-c-headers-path-system "/usr/include/c++/5/")
 ;;   (add-to-list 'company-backend 'company-c-headers))
 
+(define-key company-active-map (kbd "C-n") 'company-select-next)
+(define-key company-active-map (kbd "C-p") 'company-select-previous)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;; Awesome company mode configration starts here ;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package flycheck
   :ensure t
   :diminish flycheck-mode
@@ -487,25 +508,25 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Section for Predictive mode
 ;;
-(add-to-list 'load-path "~/.emacs.d/elisp/predictive/")
-(autoload 'predictive-mode "predictive" "predictive" t)
-(set-default 'predictive-auto-add-to-dict t)
-(setq predictive-main-dict 'rpg-dictionary
-      predictive-auto-learn t
-      predictive-add-to-dict-ask nil
-      predictive-use-auto-learn-cache nil
-      predictive-which-dict t)
+;; (add-to-list 'load-path "~/.emacs.d/elisp/predictive/")
+;; (autoload 'predictive-mode "predictive" "predictive" t)
+;; (set-default 'predictive-auto-add-to-dict t)
+;; (setq predictive-main-dict 'rpg-dictionary
+;;       predictive-auto-learn t
+;;       predictive-add-to-dict-ask nil
+;;       predictive-use-auto-learn-cache nil
+;;       predictive-which-dict t)
 
-(when (and (featurep 'predictive) (featurep 'company))
-  (defun company-predictive (command &optional arg &rest ignored)
-    (case command
-      (prefix (let* ((text (downcase (word-at-point))))
-                (set-text-properties 0 (length text) nil text)
-                text))
-      (candidates (predictive-complete arg))))
-  (load "dict-english")
-  (add-to-list 'company-backends '(company-predictive)))
-(add-hook 'org-mode-hook 'predictive-mode)
+;; (when (and (featurep 'predictive) (featurep 'company))
+;;   (defun company-predictive (command &optional arg &rest ignored)
+;;     (case command
+;;       (prefix (let* ((text (downcase (word-at-point))))
+;;                 (set-text-properties 0 (length text) nil text)
+;;                 text))
+;;       (candidates (predictive-complete arg))))
+;;   (load "dict-english")
+;;   (add-to-list 'company-backends '(company-predictive)))
+;; (add-hook 'org-mode-hook 'predictive-mode)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; (use-package predictive
@@ -575,8 +596,15 @@
 ;;   (([remap execute-extended-command] . smex)
 ;;    ("M-X" . smex-major-mode-commands)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;; Awesome helm configration starts here ;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package helm
   :ensure t
+  :diminish helm-mode
+  :defer t
   :bind (("C-x C-f" . helm-find-files))
   :init
   (progn
@@ -584,7 +612,19 @@
     (helm-mode 1)
     (set-face-attribute 'helm-selection nil
                         )))
+(use-package helm-swoop
+  :ensure t
+  :bind (("M-i" . helm-swoop)))
 
+(global-set-key (h))
+;; :init
+;; (bind-key "M-m" 'helm-swoop-from-isearch isearch-mode-map))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;; Awesome helm configration ends here ;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package golden-ratio                 ; Auto resize windows
   :ensure t
   :diminish golden-ratio-mode
@@ -606,73 +646,58 @@
 ;; c++ development irony starts here
 
 ;; tags for code navigation
-;; (use-package ggtags
-;;   :ensure t
-;;   :init
-;;   (setq path-to-ctags "/usr/local/bin/ctags")
-;;   :bind
-;;   (:map evil-normal-state-map
-;;         ;; ("M-," . ggt)
-;;         ("M-." .  ggtags-find-tag-dwim))
-;;   :config
-;;   (add-hook 'c-mode-common-hook
-;;             (lambda ()
-;;               (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-;;                 (ggtags-mode 1))))
-;;   ;; :evil-leader ("," ggtags-find-tag-dwim)
-;;   )
 
+(use-package irony
+  :ensure t
+  :commands (irony-mode))
 
-;; (defun setup-c-clang-options ()
-;;   (setq irony-additional-clang-options (quote ("-std=c11"))))
+(use-package irony-eldoc
+  :ensure t
+  :commands (irony-eldoc))
 
-;; (defun setup-cpp-clang-options ()
-;;   (setq irony-additional-clang-options (quote ("-std=c++11" "-I/usr/local/include/Eigen/Eigen/")))
-;;   (setq irony-additional-clang-options '("-std=c++11"))
-;;   (setq irony-additional-clang-options (quote ("-std=c++14" "-stdlib=libc++"))))
+(use-package platformio-mode
+  :ensure t
+  :commands (platformio-conditionally-enable)
+  :config (platformio-setup-compile-buffer))
 
-;; (use-package irony
-;;   :ensure t
-;;   :init
-;;   (progn
-;;     (add-hook 'c++-mode-hook 'irony-mode)
-;;     (add-hook 'c-mode-hook 'irony-mode)
-;;     (add-hook 'objc-mode-hook 'irony-mode))
-;;   :config
-;;   (progn
-;;     ;; (setq irony-libclang-additional-flags
-;;     ;;       (append '("-I" "inc") irony-libclang-additional-flags))
-;;     (add-hook 'c++-mode-hook 'setup-cpp-clang-options)
-;;     (add-hook 'c-mode-hook 'setup-c-clang-options)))
+(defun irony-and-platformio-hook ()
+  (irony-mode)
+  (irony-eldoc)
+  (platformio-conditionally-enable))
 
-;; (use-package company-irony
-;;   :ensure t
-;;   :config
-;;   (progn
-;;     (eval-after-load 'company '(add-to-list 'company-backends 'company-irony))
-;;     (add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)))
+(add-hook 'c-mode-hook 'irony-and-platformio-hook)
+(add-hook 'c++-mode-hook 'irony-and-platformio-hook)
 
-;; (use-package flycheck-irony
-;; :ensure t
-;; :config
-;; (eval-after-load 'flycheck
-;;   '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup)))
+(defun irony-use-async-ac ()
+  (define-key irony-mode-map [remap completion-at-point]
+    'irony-completion-at-point-async)
 
-;; (use-package clang-format
-;;   :ensure t
-;;   :config
-;;   (progn
-;;     (setq clang-format-style "llvm")
-;; (add-hook 'c++-mode-hook (lambda () (add-hook 'before-save-hook 'clang-format-buffer nil t)))
-;; (add-hook 'c-mode-hook (lambda () (add-hook 'before-save-hook 'clang-format-buffer nil t)))))
+  (define-key irony-mode-map [remap completion-symbol]
+    'irony-completion-at-point-async)
+  (irony-cdb-autosetup-compile-options))
 
-;; (use-package google-c-style
-;;   :ensure t
-;;   :defer t
-;;   :config
-;;   (progn
-;;     (add-hook 'c-mode-common-hook 'google-set-c-style)
-;;     (add-hook 'c-mode-common-hook 'google-make-newline-indent)))
+(add-hook 'irony-mode-hook 'irony-use-async-ac)
+
+(use-package flycheck-irony
+  :ensure t
+  :defer 2
+  :init (add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
+
+(use-package clang-format
+  :ensure t
+  :config
+  (progn
+    (setq clang-format-style "llvm")
+    (add-hook 'c++-mode-hook (lambda () (add-hook 'before-save-hook 'clang-format-buffer nil t)))
+    (add-hook 'c-mode-hook (lambda () (add-hook 'before-save-hook 'clang-format-buffer nil t)))))
+
+(use-package google-c-style
+  :ensure t
+  :defer t
+  :config
+  (progn
+    (add-hook 'c-mode-common-hook 'google-set-c-style)
+    (add-hook 'c-mode-common-hook 'google-make-newline-indent)))
 
 ;; c++ development irony ends here
 
@@ -782,6 +807,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CPP rtags and irony combined unique development
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;      ORG-MODE     ;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; org mode configuration mainly agenda
 (define-key global-map "\C-cl" 'org-store-link)
@@ -796,15 +824,41 @@
 (setq org-clock-persist 'history)
 (org-clock-persistence-insinuate)
 
-;; kill all oher buffers
-(defun nuke-all-buffers ()
-  (interactive)
-  (mapcar 'kill-buffer (buffer-list))
-  (delete-other-windows))
+;; enable python for in-buffer evaluation
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((python . t)))
 
-(global-set-key (kbd "C-x K") 'nuke-all-buffers)
+;; all python code be safe
+(defun my-org-confirm-babel-evaluate (lang body)
+  (not (string= lang "python")))
+(setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
 
-;; evil escape
+(defun indent-org-block-automatically ()
+  (when (org-in-src-block-p)
+    (org-edit-special)
+    (indent-region (point-min) (point-max))
+    (org-edit-src-exit)))
+
+;; (run-at-time 1 0.1 'indent-org-block-automatically)
+(setq org-src-preserve-indentation nil
+      org-edit-src-content-indentation 0)
+
+(setq org-src-tab-acts-natively t)
+
+;; cross-reference, bibliography, glossary, and index manager
+;; initially written by the creator of Org Mode
+(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+
+;; Org babel load languages
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((latex . t)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;      ORG-MODE     ;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package evil-escape
   :diminish evil-escape-mode
   :config
@@ -812,7 +866,9 @@
   (setq-default evil-escape-key-sequence "jk")
   (setq-default evil-escape-delay 0.1)
   )
-;; (require 'evil-escape-mode)
+
+(use-package undo-tree
+  :diminish undo-tree-mode)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -821,7 +877,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (rtags fzf ensime-emacs ensime sr-speedbar cython-mode solarized-theme zenburn-theme processing-mode avy smartparens emacs-rustfmt evil-magit magit rainbow-delimiters scheme-complete paredit racket-mode company-quickhelp ggtags predictive-mode predictive markdown-mode meghanada meghananda-emacs meghananda jde-mode company-emacs-eclim eclim emacs-eclim rustfmt flycheck-package toml-mode clang-format racer exec-path-from-shell which-key use-package smex rich-minority restart-emacs py-yapf monokai-theme helm golden-ratio flycheck flx-ido evil-terminal-cursor-changer evil-surround evil-nerd-commenter evil-leader evil-exchange elpy company-statistics company-irony company-c-headers company-ansible color-theme auctex aggressive-indent))))
+    (helm-swoop gtags evil-escape rtags fzf ensime-emacs ensime sr-speedbar cython-mode solarized-theme zenburn-theme processing-mode avy smartparens emacs-rustfmt evil-magit magit rainbow-delimiters scheme-complete paredit racket-mode company-quickhelp ggtags predictive-mode predictive markdown-mode meghanada meghananda-emacs meghananda jde-mode company-emacs-eclim eclim emacs-eclim rustfmt flycheck-package toml-mode clang-format racer exec-path-from-shell which-key use-package smex rich-minority restart-emacs py-yapf monokai-theme helm golden-ratio flycheck flx-ido evil-terminal-cursor-changer evil-surround evil-nerd-commenter evil-leader evil-exchange elpy company-statistics company-irony company-c-headers company-ansible color-theme auctex aggressive-indent))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
