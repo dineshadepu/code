@@ -1,4 +1,31 @@
-* Predictive corrective SPH (PCISPH)
-  This method is a combination of best of WCSPH with IISPH.
-  It is introduced by [[https://graphics.ethz.ch/~sobarbar/papers/Sol09/Sol09.pdf][B. Solenthaler and R. Pajarola (University of Zurich)]].
-* Algorithm in pure python.
+#+STARTUP: showall
+#+OPTIONS: tex:t
+#+OPTIONS: tex:nil
+#+OPTIONS: tex:verbatim
+
+This implementation is reproduced from
+[[https://pdfs.semanticscholar.org/fbc1/b9c2a3438c79a1ef8684bc87ac5e2149643e.pdf][Boundary handling and adaptive time-stepping for PCISPH]].
+
+Authors: Markus Ihmsen ,Nadir Akinci ,Marc Gissler ,Matthias Teschner
+Place: University of Freiburg
+
+* Boundary handling in PCISPH.
+  In [[https://pdfs.semanticscholar.org/fbc1/b9c2a3438c79a1ef8684bc87ac5e2149643e.pdf][BHATP]] boundaries are represented using non moving fluid particles, which
+  has the following properties
+  - mass(m_b), density(\rho_b), pressure (p_b)
+  - More importantly **normalized normal (n_b)**.
+  - The spacing between boundary particles is
+
+
+
+* Doubts
+
+** [[https://pdfs.semanticscholar.org/fbc1/b9c2a3438c79a1ef8684bc87ac5e2149643e.pdf][Boundary handling and adaptive time-stepping for PCISPH]].
+
+*** Boundary particle spacing.
+    Boundary particle spacing is equal to the equilibrium distance of
+    fluid particles.
+
+    #+BEGIN_LATEX
+    r_0 = 0.5 h
+    #+END_LATEX
