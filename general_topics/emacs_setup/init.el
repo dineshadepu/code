@@ -67,9 +67,15 @@
 ;; disable auto save
 (setq auto-save-default nil)
 
+;; Copy to clipboard
+(fset 'evil-visual-update-x-selection 'ignore)
 
 ;; Electric auto pair
 (electric-pair-mode t)
+
+;; packages used in init
+(use-package dash)
+(use-package f)
 
 (setq temporary-file-directory "~/.emacs.d/tmp/")
 
@@ -225,7 +231,6 @@
          ([right]    . windmove-right)
          ([up]       . windmove-up)
          ([down]     . windmove-down)))
-(fset 'evil-visual-update-x-selection 'ignore)
 
 
 (use-package evil-leader
@@ -559,6 +564,7 @@
            ;; (setq elpy-rpc-python-command "python3")
            ;; (setq 'python-indent-offset 4)
            (setq company-minimum-prefix-length 1)
+           (setq python-shell-completion-native-enable nil)
            ;; (elpy-use-ipython)
            ;; (elpy-clean-modeline)
            (elpy-enable)))
@@ -589,6 +595,13 @@
   (flx-ido-mode 1))
 
 
+;; (use-package ido-vertical-mode
+;;   :ensure t
+;;   :init
+;;   (setq ido-vertical-define-keys 'C-n-and-C-p-only)
+;;   :config
+;;   (ido-vertical-mode t))
+
 
 ;; (use-package smex
 ;;   :ensure t
@@ -616,7 +629,8 @@
   :ensure t
   :bind (("M-i" . helm-swoop)))
 
-(global-set-key (h))
+(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
+(global-set-key (kbd "M-y") 'helm-show-kill-ring)
 ;; :init
 ;; (bind-key "M-m" 'helm-swoop-from-isearch isearch-mode-map))
 
@@ -824,28 +838,6 @@
 (setq org-clock-persist 'history)
 (org-clock-persistence-insinuate)
 
-;; enable python for in-buffer evaluation
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((python . t)))
-
-;; all python code be safe
-(defun my-org-confirm-babel-evaluate (lang body)
-  (not (string= lang "python")))
-(setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
-
-(defun indent-org-block-automatically ()
-  (when (org-in-src-block-p)
-    (org-edit-special)
-    (indent-region (point-min) (point-max))
-    (org-edit-src-exit)))
-
-;; (run-at-time 1 0.1 'indent-org-block-automatically)
-(setq org-src-preserve-indentation nil
-      org-edit-src-content-indentation 0)
-
-(setq org-src-tab-acts-natively t)
-
 ;; cross-reference, bibliography, glossary, and index manager
 ;; initially written by the creator of Org Mode
 (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
@@ -855,9 +847,29 @@
  'org-babel-load-languages
  '((latex . t)))
 
+(use-package async
+  :ensure t)
+(provide 'async-org-babel)
+
+;; dont ask permission to run
+(setq org-confirm-babel-evaluate nil)
+
+;; ipython for org mode
+(use-package ob-ipython
+  :ensure t
+  :init
+  )
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((ipython . t)
+   (python . t)))
+
+;; fontify code in code blocks
+(setq org-src-fontify-natively t)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;      ORG-MODE     ;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;      ORG-MODE ends    ;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package evil-escape
   :diminish evil-escape-mode
@@ -870,6 +882,24 @@
 (use-package undo-tree
   :diminish undo-tree-mode)
 
+(use-package ox-rst
+  :ensure)
+
+(use-package rst
+  :config
+  (setq fill-column 79)
+  (setq rst-adornment-faces-alist
+        (quote ((nil . font-lock-keyword-face)
+                (nil . font-lock-keyword-face)
+                (nil . rst-level-1-face)
+                (2 . rst-level-2-face)
+                (3 . rst-level-3-face)
+                (4 . rst-level-4-face)
+                (5 . rst-level-5-face)
+                (nil . rst-level-5-face))))
+  :mode (("\\.rst$" . rst-mode)))
+
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -877,7 +907,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (helm-swoop gtags evil-escape rtags fzf ensime-emacs ensime sr-speedbar cython-mode solarized-theme zenburn-theme processing-mode avy smartparens emacs-rustfmt evil-magit magit rainbow-delimiters scheme-complete paredit racket-mode company-quickhelp ggtags predictive-mode predictive markdown-mode meghanada meghananda-emacs meghananda jde-mode company-emacs-eclim eclim emacs-eclim rustfmt flycheck-package toml-mode clang-format racer exec-path-from-shell which-key use-package smex rich-minority restart-emacs py-yapf monokai-theme helm golden-ratio flycheck flx-ido evil-terminal-cursor-changer evil-surround evil-nerd-commenter evil-leader evil-exchange elpy company-statistics company-irony company-c-headers company-ansible color-theme auctex aggressive-indent))))
+    (ob-ipython ox-rst ido-vertical-mode ido-vertical helm-swoop gtags evil-escape rtags fzf ensime-emacs ensime sr-speedbar cython-mode solarized-theme zenburn-theme processing-mode avy smartparens emacs-rustfmt evil-magit magit rainbow-delimiters scheme-complete paredit racket-mode company-quickhelp ggtags predictive-mode predictive markdown-mode meghanada meghananda-emacs meghananda jde-mode company-emacs-eclim eclim emacs-eclim rustfmt flycheck-package toml-mode clang-format racer exec-path-from-shell which-key use-package smex rich-minority restart-emacs py-yapf monokai-theme helm golden-ratio flycheck flx-ido evil-terminal-cursor-changer evil-surround evil-nerd-commenter evil-leader evil-exchange elpy company-statistics company-irony company-c-headers company-ansible color-theme auctex aggressive-indent))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

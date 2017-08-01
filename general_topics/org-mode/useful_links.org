@@ -5,4 +5,10 @@
 #+STARTUP: showeverything
 
 *** Yasnippets org mode
-    Here is a better folder for org mode in Emacs [[git@github.com:yyr/yasnippets-orgmode.git]]
+    Here is a better folder for org mode in Emacs
+    [[git@github.com:yyr/yasnippets-orgmode.git]]
+
+
+*** Awesome html conversion.
+
+    url = git@github.com:fniessen/org-html-themes.git
