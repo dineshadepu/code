@@ -32,9 +32,9 @@
 
 ;;; UI
 
-(setq inhibit-startup-message t)
-(tool-bar-mode -1)
-(menu-bar-mode -1)
+;; (setq inhibit-startup-message t)
+;; (tool-bar-mode -1)
+;; (menu-bar-mode -1)
 (global-linum-mode t)
 (global-hl-line-mode t)
 ;; (setq mac-command-modifier 'meta)
@@ -185,12 +185,12 @@
 ;; -------------------------------------------
 ;;(mouse-wheel-mode -1)
 
-(global-set-key [wheel-up] 'ignore)
-(global-set-key [wheel-down] 'ignore)
-(global-set-key [double-wheel-up] 'ignore)
-(global-set-key [double-wheel-down] 'ignore)
-(global-set-key [triple-wheel-up] 'ignore)
-(global-set-key [triple-wheel-down] 'ignore)
+;; (global-set-key [wheel-up] 'ignore)
+;; (global-set-key [wheel-down] 'ignore)
+;; (global-set-key [double-wheel-up] 'ignore)
+;; (global-set-key [double-wheel-down] 'ignore)
+;; (global-set-key [triple-wheel-up] 'ignore)
+;; (global-set-key [triple-wheel-down] 'ignore)
 
 ;; -------------------------------------------
 ;; -------------------------------------------
@@ -257,6 +257,8 @@
             (evil-leader/set-key "z" 'fzf)
             (evil-leader/set-key "n" 'windmove-left)
             (evil-leader/set-key "m" 'windmove-right)
+            (evil-leader/set-key "o" 'org-edit-special)
+            (evil-leader/set-key "`" 'org-edit-src-exit)
             ;; (evil-leader/set-key "h" 'helm-M-x)
             (evil-leader/set-key "k" 'kill-this-buffer)))
 
@@ -305,6 +307,11 @@
 
 (use-package evil-magit
   :ensure t)
+;; (add-hook 'magit-mode-hook
+;;           (lambda ()
+;;             (when evil-jumper-mode
+;;               (evil-jumper-mode -1))))
+;; (add-hook 'magit-mode-hook (lambda () (evil-jumper-mode -1)))
 
 (use-package evil-nerd-commenter
   :ensure t
@@ -347,7 +354,7 @@
   :bind (("C-c f" . company-files)
          ("C-c a" . company-dabbrev)
          ("C-c d" . company-ispell)
-         ("<tab>" . tab-indent-or-complete)
+         ;; ("<tab>" . tab-indent-or-complete)
          ("TAB" . tab-indent-or-complete)
          ("M-t" . company-complete-common)
          :map company-active-map
