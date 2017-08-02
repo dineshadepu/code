@@ -1083,12 +1083,14 @@
 
 ;; bibtex entries for org mode and everything.
 (use-package helm-bibtex
-  :load-path "~/.emacs.d/elisp/helm-bibtex"
+  ;; :load-path "~/.emacs.d/elisp/helm-bibtex"
+  :ensure t
   :config)
 
 ;; org ref installation and configurations starts.
 (use-package org-ref
-  :load-path "~/.emacs.d/elisp/org-ref"
+  :ensure t
+  ;; :load-path "~/.emacs.d/elisp/org-ref"
   :config)
 
 ;; Open pdf's in evince.
