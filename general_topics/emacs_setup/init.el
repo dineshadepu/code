@@ -832,6 +832,187 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;      ORG-MODE     ;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Taken from
+;; https://github.com/bixuanzju/emacs.d/blob/master/emacs-init.org
+;; starts
+(use-package org-ref
+  :after org
+  :init
+  (setq reftex-default-bibliography '("~/Dropbox/Research/references.bib"))
+  (setq org-ref-bibliography-notes "~/Dropbox/Research/notes/notes.org"
+        org-ref-default-bibliography '("~/Dropbox/Research/references.bib")
+        org-ref-pdf-directory "~/Dropbox/papers/")
+
+  (setq helm-bibtex-bibliography "~/Dropbox/Research/references.bib")
+  (setq helm-bibtex-library-path "~/Dropbox/papers/")
+
+  (setq helm-bibtex-pdf-open-function
+        (lambda (fpath)
+          (start-process "open" "*open*" "open" fpath)))
+
+  (setq helm-bibtex-notes-path "~/Dropbox/Research/notes/notes.org")
+  :config
+  (key-chord-define-global "uu" 'org-ref-cite-hydra/body)
+  ;; variables that control bibtex key format for auto-generation
+  ;; I want firstauthor-year-title-words
+  ;; this usually makes a legitimate filename to store pdfs under.
+  (setq bibtex-autokey-year-length 4
+        bibtex-autokey-name-year-separator "-"
+        bibtex-autokey-year-title-separator "-"
+        bibtex-autokey-titleword-separator "-"
+        bibtex-autokey-titlewords 2
+        bibtex-autokey-titlewords-stretch 1
+        bibtex-autokey-titleword-length 5))
+
+(use-package org-autolist
+  :after org
+  :config
+  (org-autolist-mode +1))
+
+(use-package doi-utils
+  :after org)
+
+(use-package org-ref-bibtex
+  :after org
+  :init
+  (setq org-ref-bibtex-hydra-key-binding "\C-cj"))
+
+(use-package org
+  :defer t
+  :bind (("C-c a" . org-agenda)
+         ("C-c c" . org-capture)
+         ("C-c l" . org-store-link))
+  :config
+  (require 'ox-md)
+  (unbind-key "C-c ;" org-mode-map)
+
+  ;;file to save todo items
+  (setq org-agenda-files (quote ("~/Dropbox/Research/todo.org")))
+
+
+  ;;set priority range from A to C with default A
+  (setq org-highest-priority ?A)
+  (setq org-lowest-priority ?C)
+  (setq org-default-priority ?A)
+
+
+  ;;set colours for priorities
+  (setq org-priority-faces '((?A . (:foreground "OliveDrab" :weight bold))
+                             (?B . (:foreground "LightSteelBlue"))
+                             (?C . (:foreground "#F0DFAF"))))
+
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; org-mode agenda options                                                ;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;open agenda in current window
+  (setq org-agenda-window-setup (quote current-window))
+  ;;warn me of any deadlines in next 7 days
+  (setq org-deadline-warning-days 7)
+
+  ;;don't show tasks as scheduled if they are already shown as a deadline
+  (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
+  ;;don't give awarning colour to tasks with impending deadlines
+  ;;if they are scheduled to be done
+  (setq org-agenda-skip-deadline-prewarning-if-scheduled (quote pre-scheduled))
+  ;;don't show tasks that are scheduled or have deadlines in the
+  ;;normal todo list
+  (setq org-agenda-todo-ignore-deadlines (quote all))
+  (setq org-agenda-todo-ignore-scheduled (quote all))
+
+  ;;sort tasks in order of when they are due and then by priority
+
+  (setq org-agenda-sorting-strategy
+        (quote
+         ((agenda deadline-up priority-down)
+          (todo priority-down category-keep)
+          (tags priority-down category-keep)
+          (search category-keep))))
+
+  (setq org-capture-templates
+        '(("t" "todo" entry (file+headline "~/Dropbox/Research/todo.org" "Tasks")
+           "* TODO [#A] %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n")))
+
+
+  (defun my/org-mode-defaults ()
+    (turn-on-org-cdlatex)
+    ;; (diminish 'org-cdlatex-mode "")
+    (turn-on-auto-fill)
+
+    ;; make `company-backends' local is critcal
+    ;; or else, you will have completion in every major mode, that's very annoying!
+    (make-local-variable 'company-backends)
+    ;; company-ispell is the plugin to complete words
+    (add-to-list 'company-backends 'company-ispell))
+
+  (add-hook 'org-mode-hook 'my/org-mode-defaults)
+
+  ;; Fontify org-mode code blocks
+  (setq org-src-fontify-natively t)
+
+  (setq org-todo-keywords
+        (quote ((sequence "TODO(t)" "|" "CANCELLED(c@/!)" "DONE(d)"))))
+
+  (setq org-use-fast-todo-selection t)
+  (setq org-treat-S-cursor-todo-selection-as-state-change nil)
+
+  (setq org-todo-keyword-faces
+        '(("TODO" . (:foreground "green" :weight bold))
+          ("NEXT" :foreground "blue" :weight bold)
+          ("WAITING" :foreground "orange" :weight bold)
+          ("HOLD" :foreground "magenta" :weight bold)
+          ("CANCELLED" :foreground "forest green" :weight bold)))
+
+  (setq org-enforce-todo-dependencies t)
+  (setq org-src-tab-acts-natively t)
+
+  (setq org-latex-pdf-process
+        (quote ("pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f"
+                "bibtex $(basename %b)"
+                "pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f"
+                "pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f")))
+
+  (setq org-latex-create-formula-image-program 'imagemagick)
+
+  ;; Tell the latex export to use the minted package for source
+  ;; code coloration.
+  (add-to-list 'org-latex-packages-alist '("" "minted"))
+  (require 'ox-latex)
+  (setq org-latex-listings 'minted)
+
+  ;; (setq org-latex-minted-options
+  ;;       '(("frame" "lines") ("framesep" "6pt")
+  ;;         ("mathescape" "true") ("fontsize" "\\small")))
+
+  (setq org-confirm-babel-evaluate nil)
+
+  ;; execute external programs.
+  (org-babel-do-load-languages
+   (quote org-babel-load-languages)
+   (quote ((emacs-lisp . t)
+           (dot . t)
+           (ditaa . t)
+           (python . t)
+           (ruby . t)
+           (gnuplot . t)
+           (clojure . t)
+           (haskell . t)
+           (octave . t)
+           (org . t)
+           (plantuml . t)
+           (scala . t)
+           (sql . t)
+           (latex . t))))
+
+  (eval-after-load 'org-src
+    '(define-key org-src-mode-map
+       "\C-x\C-s" #'org-edit-src-exit)))
+
+;; Taken from
+;; https://github.com/bixuanzju/emacs.d/blob/master/emacs-init.org
+;; ends
+
+
 ;; org mode configuration mainly agenda
 (define-key global-map "\C-cl" 'org-store-link)
 (define-key global-map "\C-ca" 'org-agenda)
@@ -858,8 +1039,6 @@
   :ensure t)
 (provide 'async-org-babel)
 
-;; dont ask permission to run
-(setq org-confirm-babel-evaluate nil)
 
 ;; ipython for org mode
 (use-package ob-ipython
@@ -869,11 +1048,59 @@
 
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((ipython . t)
-   (python . t)))
+ '(
+   ;; (sh         . t)
+   (ipython . t)
+   (js         . t)
+   (emacs-lisp . t)
+   (perl       . t)
+   (scala      . t)
+   (clojure    . t)
+   (python     . t)
+   (ruby       . t)
+   (ditaa . t)
+   (dot . t)
+   (plantuml . t)
+   (gnuplot . t)
+   (dot        . t)
+   (css        . t)
+   (plantuml   . t)))
 
 ;; fontify code in code blocks
-(setq org-src-fontify-natively t)
+;; dont ask permission to run
+(setq org-confirm-babel-evaluate nil
+      org-src-fontify-natively t
+      org-src-tab-acts-natively t)
+
+(setq org-latex-packages-alist
+      (quote (("" "color" t)
+              ("" "minted" t)
+              ("" "parskip" t)
+              ("" "tikz" t))))
+
+(setq org-latex-create-formula-image-program 'imagemagick)
+
+
+;; bibtex entries for org mode and everything.
+(use-package helm-bibtex
+  :load-path "~/.emacs.d/elisp/helm-bibtex"
+  :config)
+
+;; org ref installation and configurations starts.
+(use-package org-ref
+  :load-path "~/.emacs.d/elisp/org-ref"
+  :config)
+
+;; Open pdf's in evince.
+(eval-after-load "org"
+  '(progn
+     ;; .txt files aren't in the list initially, but in case that changes
+     ;; in a future version of org, use if to avoid errors
+     (if (assoc "\\.txt\\'" org-file-apps)
+         (setcdr (assoc "\\.txt\\'" org-file-apps) "notepad.exe %s")
+       (add-to-list 'org-file-apps '("\\.txt\\'" . "notepad.exe %s") t))
+     ;; Change .pdf association directly within the alist
+     (setcdr (assoc "\\.pdf\\'" org-file-apps) "evince %s")))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;      ORG-MODE ends    ;;;;;;;;;;;;;;;;;;;;;;;
@@ -906,15 +1133,22 @@
                 (nil . rst-level-5-face))))
   :mode (("\\.rst$" . rst-mode)))
 
+;; smart tabs
+(use-package smart-tab
+  :load-path "~/.emacs.d/elisp/smart-tab"
+  )
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(org-agenda-files
+   (quote
+    ("~/particle_assignments/assignment1/as1.org" "/home/dinesh/code/general_topics/org-mode/org_to_html.org" "/home/dinesh/code/general_topics/org-mode/org-html-themes/styles/readtheorg/readtheorg.org" "/home/dinesh/code/general_topics/org-mode/org-html-themes/demo/example.org" "/home/dinesh/code/general_topics/org-mode/org-html-themes/README.org" "/home/dinesh/code/general_topics/org-mode/useful_links.org" "/home/dinesh/code/literatureSurvey/pcisph/pcisph_papers.org" "/home/dinesh/code/literatureSurvey/pcisph/observation.org" "/home/dinesh/code/literatureSurvey/porousFlow/porous2008.org" "/home/dinesh/code/schedule/today/20-07-2017.org" "/home/dinesh/code/schedule/today/21-07-2017.org" "/home/dinesh/code/schedule/today/24-07-2017.org" "/home/dinesh/code/schedule/mathematics.org" "/home/dinesh/code/schedule/porous_body.org" "/home/dinesh/code/schedule/general_subjects.org" "/home/dinesh/code/schedule/targets.org")))
  '(package-selected-packages
    (quote
-    (ob-ipython ox-rst ido-vertical-mode ido-vertical helm-swoop gtags evil-escape rtags fzf ensime-emacs ensime sr-speedbar cython-mode solarized-theme zenburn-theme processing-mode avy smartparens emacs-rustfmt evil-magit magit rainbow-delimiters scheme-complete paredit racket-mode company-quickhelp ggtags predictive-mode predictive markdown-mode meghanada meghananda-emacs meghananda jde-mode company-emacs-eclim eclim emacs-eclim rustfmt flycheck-package toml-mode clang-format racer exec-path-from-shell which-key use-package smex rich-minority restart-emacs py-yapf monokai-theme helm golden-ratio flycheck flx-ido evil-terminal-cursor-changer evil-surround evil-nerd-commenter evil-leader evil-exchange elpy company-statistics company-irony company-c-headers company-ansible color-theme auctex aggressive-indent))))
+    (smart-tab helm-bibtex org-ref ob-ipython ox-rst ido-vertical-mode ido-vertical helm-swoop gtags evil-escape rtags fzf ensime-emacs ensime sr-speedbar cython-mode solarized-theme zenburn-theme processing-mode avy smartparens emacs-rustfmt evil-magit magit rainbow-delimiters scheme-complete paredit racket-mode company-quickhelp ggtags predictive-mode predictive markdown-mode meghanada meghananda-emacs meghananda jde-mode company-emacs-eclim eclim emacs-eclim rustfmt flycheck-package toml-mode clang-format racer exec-path-from-shell which-key use-package smex rich-minority restart-emacs py-yapf monokai-theme helm golden-ratio flycheck flx-ido evil-terminal-cursor-changer evil-surround evil-nerd-commenter evil-leader evil-exchange elpy company-statistics company-irony company-c-headers company-ansible color-theme auctex aggressive-indent))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
