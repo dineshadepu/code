@@ -1,3 +1,4 @@
 * TODO Rigid body course
 * TODO 3d rigid body dynamics
 * TODO porous paper read [[file:~/code/literatureSurvey/porousFlow/porous2008.org][porous rigid body org paper link]]
+* TODO Mathematics and Physics for Programmers Book.

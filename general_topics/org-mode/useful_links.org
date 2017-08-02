@@ -12,3 +12,26 @@
 *** Awesome html conversion.
 
     url = git@github.com:fniessen/org-html-themes.git
+
+    - keep this line on top of the file
+      #+SETUPFILE: /home/dinesh/org-html-themes/setup/theme-bigblow.setup
+
+
+*** Install Emacs 25.1
+
+Stable versions (25.1 currently):
+
+sudo apt-add-repository -y ppa:adrozdoff/emacs
+sudo apt update
+sudo apt install emacs25
+Provided packages for LTS 14.04 and 16.04.
+
+*** Unusual installation behavious
+    - do M-x package refresh.
+    - And install.
+
+
+
+*** Install Dropbox.
+
+*** Install latex
