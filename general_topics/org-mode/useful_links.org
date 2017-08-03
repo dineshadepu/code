@@ -6,7 +6,7 @@
 
 *** Yasnippets org mode
     Here is a better folder for org mode in Emacs
-    [[git@github.com:yyr/yasnippets-orgmode.git]]
+    url = git@github.com:yyr/yasnippets-orgmode.git
 
 
 *** Awesome html conversion.
@@ -19,12 +19,12 @@
 
 *** Install Emacs 25.1
 
-Stable versions (25.1 currently):
+    Stable versions (25.1 currently):
 
-sudo apt-add-repository -y ppa:adrozdoff/emacs
-sudo apt update
-sudo apt install emacs25
-Provided packages for LTS 14.04 and 16.04.
+    - sudo apt-add-repository -y ppa:adrozdoff/emacs
+    - sudo apt update
+    - sudo apt install emacs25
+    - Provided packages for LTS 14.04 and 16.04.
 
 *** Unusual installation behavious
     - do M-x package refresh.
@@ -35,3 +35,49 @@ Provided packages for LTS 14.04 and 16.04.
 *** Install Dropbox.
 
 *** Install latex
+
+
+*** Emacs snapshot version is 26.0.50
+
+
+*** Citing and notes in org-ref
+
+    Citing is easy.
+**** Using doi
+     - Say you have a DOI of a paper.
+     - do M-x doi-add-bibtex-entry
+     - It will automatically add the paper. And will download if it is allowed.
+
+**** Using cross ref
+     - Say we have a title or author or journal of a paper.
+     - Then do, M-x cross-ref-add-bibtex-entry
+     - Paste the title or what ever.
+     - org-ref will search for our paper and gives few suggestions.
+     - Enter on requisite paper.
+     - If you want more then mark all those papers and enter. C-spc.
+
+    Notes creation from bib file.
+
+**** from bib file
+     Once the bib file is created. We can do
+     - do M-x org-ref-open-bibtex-notes.
+     - It will create a heading named after your file. With citing
+       your bib. And other contents.
+     - Since it is citing your file. Org-ref has awesome functions for
+       clickable citations.
+     - you can go to the link of the citation. Or you can download the pdf
+       from web and many more.
+     - Say, while entering the bib using crossref or doi, our system
+       didn't download the pdf.
+     - Since in clickable link we have a download option it will download
+       it if available.
+     - If our institute is not allowing so. Then we can manually
+       download the pdf.
+     - And don't forget to save it in your default papers storage directory.
+     - And save it as the name as it was cited.
+
+
+
+**** Evil key bindings.
+     - (evil-leader/set-key "p" 'org-ref-open-pdf-at-point)
+     - (evil-leader/set-key "o" 'org-ref-open-bibtex-notes)
