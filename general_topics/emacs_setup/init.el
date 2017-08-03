@@ -334,7 +334,7 @@
              company-files
              company-dabbrev
              company-ispell
-             ;; company-c-headers
+             company-c-headers
              company-jedi
              company-auctex
              company--auto-completion
@@ -852,7 +852,6 @@
 
   (setq helm-bibtex-notes-path "~/Dropbox/Research/notes/notes.org")
   :config
-  (key-chord-define-global "uu" 'org-ref-cite-hydra/body)
   ;; variables that control bibtex key format for auto-generation
   ;; I want firstauthor-year-title-words
   ;; this usually makes a legitimate filename to store pdfs under.
@@ -873,9 +872,7 @@
   :after org)
 
 (use-package org-ref-bibtex
-  :after org
-  :init
-  (setq org-ref-bibtex-hydra-key-binding "\C-cj"))
+  :after org)
 
 (use-package org
   :defer t
@@ -934,22 +931,6 @@
            "* TODO [#A] %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n")))
 
 
-  (defun my/org-mode-defaults ()
-    (turn-on-org-cdlatex)
-    ;; (diminish 'org-cdlatex-mode "")
-    (turn-on-auto-fill)
-
-    ;; make `company-backends' local is critcal
-    ;; or else, you will have completion in every major mode, that's very annoying!
-    (make-local-variable 'company-backends)
-    ;; company-ispell is the plugin to complete words
-    (add-to-list 'company-backends 'company-ispell))
-
-  (add-hook 'org-mode-hook 'my/org-mode-defaults)
-
-  ;; Fontify org-mode code blocks
-  (setq org-src-fontify-natively t)
-
   (setq org-todo-keywords
         (quote ((sequence "TODO(t)" "|" "CANCELLED(c@/!)" "DONE(d)"))))
 
@@ -964,7 +945,7 @@
           ("CANCELLED" :foreground "forest green" :weight bold)))
 
   (setq org-enforce-todo-dependencies t)
-  (setq org-src-tab-acts-natively t)
+  ;; (setq org-src-tab-acts-natively t)
 
   (setq org-latex-pdf-process
         (quote ("pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f"
@@ -1050,7 +1031,6 @@
  'org-babel-load-languages
  '(
    ;; (sh         . t)
-   (ipython . t)
    (js         . t)
    (emacs-lisp . t)
    (perl       . t)
@@ -1069,8 +1049,7 @@
 ;; fontify code in code blocks
 ;; dont ask permission to run
 (setq org-confirm-babel-evaluate nil
-      org-src-fontify-natively t
-      org-src-tab-acts-natively t)
+      org-src-fontify-natively t)
 
 (setq org-latex-packages-alist
       (quote (("" "color" t)
@@ -1083,14 +1062,12 @@
 
 ;; bibtex entries for org mode and everything.
 (use-package helm-bibtex
-  ;; :load-path "~/.emacs.d/elisp/helm-bibtex"
   :ensure t
   :config)
 
 ;; org ref installation and configurations starts.
 (use-package org-ref
   :ensure t
-  ;; :load-path "~/.emacs.d/elisp/org-ref"
   :config)
 
 ;; Open pdf's in evince.
@@ -1103,6 +1080,14 @@
        (add-to-list 'org-file-apps '("\\.txt\\'" . "notepad.exe %s") t))
      ;; Change .pdf association directly within the alist
      (setcdr (assoc "\\.pdf\\'" org-file-apps) "evince %s")))
+
+;; Turn on cdlatex
+(use-package cdlatex
+  :ensure t
+  :config)
+
+(add-hook 'LaTeX-mode-hook 'turn-on-cdlatex)   ; with AUCTeX LaTeX mode
+(add-hook 'latex-mode-hook 'turn-on-cdlatex)   ; with Emacs latex mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;      ORG-MODE ends    ;;;;;;;;;;;;;;;;;;;;;;;
@@ -1135,10 +1120,7 @@
                 (nil . rst-level-5-face))))
   :mode (("\\.rst$" . rst-mode)))
 
-;; smart tabs
-(use-package smart-tab
-  :load-path "~/.emacs.d/elisp/smart-tab"
-  )
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -1150,7 +1132,7 @@
     ("~/particle_assignments/assignment1/as1.org" "/home/dinesh/code/general_topics/org-mode/org_to_html.org" "/home/dinesh/code/general_topics/org-mode/org-html-themes/styles/readtheorg/readtheorg.org" "/home/dinesh/code/general_topics/org-mode/org-html-themes/demo/example.org" "/home/dinesh/code/general_topics/org-mode/org-html-themes/README.org" "/home/dinesh/code/general_topics/org-mode/useful_links.org" "/home/dinesh/code/literatureSurvey/pcisph/pcisph_papers.org" "/home/dinesh/code/literatureSurvey/pcisph/observation.org" "/home/dinesh/code/literatureSurvey/porousFlow/porous2008.org" "/home/dinesh/code/schedule/today/20-07-2017.org" "/home/dinesh/code/schedule/today/21-07-2017.org" "/home/dinesh/code/schedule/today/24-07-2017.org" "/home/dinesh/code/schedule/mathematics.org" "/home/dinesh/code/schedule/porous_body.org" "/home/dinesh/code/schedule/general_subjects.org" "/home/dinesh/code/schedule/targets.org")))
  '(package-selected-packages
    (quote
-    (smart-tab helm-bibtex org-ref ob-ipython ox-rst ido-vertical-mode ido-vertical helm-swoop gtags evil-escape rtags fzf ensime-emacs ensime sr-speedbar cython-mode solarized-theme zenburn-theme processing-mode avy smartparens emacs-rustfmt evil-magit magit rainbow-delimiters scheme-complete paredit racket-mode company-quickhelp ggtags predictive-mode predictive markdown-mode meghanada meghananda-emacs meghananda jde-mode company-emacs-eclim eclim emacs-eclim rustfmt flycheck-package toml-mode clang-format racer exec-path-from-shell which-key use-package smex rich-minority restart-emacs py-yapf monokai-theme helm golden-ratio flycheck flx-ido evil-terminal-cursor-changer evil-surround evil-nerd-commenter evil-leader evil-exchange elpy company-statistics company-irony company-c-headers company-ansible color-theme auctex aggressive-indent))))
+    (cdlatex smart-tab helm-bibtex org-ref ob-ipython ox-rst ido-vertical-mode ido-vertical helm-swoop gtags evil-escape rtags fzf ensime-emacs ensime sr-speedbar cython-mode solarized-theme zenburn-theme processing-mode avy smartparens emacs-rustfmt evil-magit magit rainbow-delimiters scheme-complete paredit racket-mode company-quickhelp ggtags predictive-mode predictive markdown-mode meghanada meghananda-emacs meghananda jde-mode company-emacs-eclim eclim emacs-eclim rustfmt flycheck-package toml-mode clang-format racer exec-path-from-shell which-key use-package smex rich-minority restart-emacs py-yapf monokai-theme helm golden-ratio flycheck flx-ido evil-terminal-cursor-changer evil-surround evil-nerd-commenter evil-leader evil-exchange elpy company-statistics company-irony company-c-headers company-ansible color-theme auctex aggressive-indent))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
