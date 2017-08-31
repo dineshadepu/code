@@ -831,10 +831,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;      ORG-MODE     ;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Taken from
-;; https://github.com/bixuanzju/emacs.d/blob/master/emacs-init.org
-;; starts
 (use-package org-ref
   :after org
   :init
@@ -1103,36 +1099,30 @@
 (use-package undo-tree
   :diminish undo-tree-mode)
 
-(use-package ox-rst
-  :ensure)
+;; (use-package ox-rst
+;;   :ensure)
 
-(use-package rst
-  :config
-  (setq fill-column 79)
-  (setq rst-adornment-faces-alist
-        (quote ((nil . font-lock-keyword-face)
-                (nil . font-lock-keyword-face)
-                (nil . rst-level-1-face)
-                (2 . rst-level-2-face)
-                (3 . rst-level-3-face)
-                (4 . rst-level-4-face)
-                (5 . rst-level-5-face)
-                (nil . rst-level-5-face))))
-  :mode (("\\.rst$" . rst-mode)))
-
-
-
+;; (use-package rst
+;;   :config
+;;   (setq fill-column 79)
+;;   (setq rst-adornment-faces-alist
+;;         (quote ((nil . font-lock-keyword-face)
+;;                 (nil . font-lock-keyword-face)
+;;                 (nil . rst-level-1-face)
+;;                 (2 . rst-level-2-face)
+;;                 (3 . rst-level-3-face)
+;;                 (4 . rst-level-4-face)
+;;                 (5 . rst-level-5-face)
+;;                 (nil . rst-level-5-face))))
+;;   :mode (("\\.rst$" . rst-mode)))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(org-agenda-files
-   (quote
-    ("~/particle_assignments/assignment1/as1.org" "/home/dinesh/code/general_topics/org-mode/org_to_html.org" "/home/dinesh/code/general_topics/org-mode/org-html-themes/styles/readtheorg/readtheorg.org" "/home/dinesh/code/general_topics/org-mode/org-html-themes/demo/example.org" "/home/dinesh/code/general_topics/org-mode/org-html-themes/README.org" "/home/dinesh/code/general_topics/org-mode/useful_links.org" "/home/dinesh/code/literatureSurvey/pcisph/pcisph_papers.org" "/home/dinesh/code/literatureSurvey/pcisph/observation.org" "/home/dinesh/code/literatureSurvey/porousFlow/porous2008.org" "/home/dinesh/code/schedule/today/20-07-2017.org" "/home/dinesh/code/schedule/today/21-07-2017.org" "/home/dinesh/code/schedule/today/24-07-2017.org" "/home/dinesh/code/schedule/mathematics.org" "/home/dinesh/code/schedule/porous_body.org" "/home/dinesh/code/schedule/general_subjects.org" "/home/dinesh/code/schedule/targets.org")))
  '(package-selected-packages
    (quote
-    (cdlatex smart-tab helm-bibtex org-ref ob-ipython ox-rst ido-vertical-mode ido-vertical helm-swoop gtags evil-escape rtags fzf ensime-emacs ensime sr-speedbar cython-mode solarized-theme zenburn-theme processing-mode avy smartparens emacs-rustfmt evil-magit magit rainbow-delimiters scheme-complete paredit racket-mode company-quickhelp ggtags predictive-mode predictive markdown-mode meghanada meghananda-emacs meghananda jde-mode company-emacs-eclim eclim emacs-eclim rustfmt flycheck-package toml-mode clang-format racer exec-path-from-shell which-key use-package smex rich-minority restart-emacs py-yapf monokai-theme helm golden-ratio flycheck flx-ido evil-terminal-cursor-changer evil-surround evil-nerd-commenter evil-leader evil-exchange elpy company-statistics company-irony company-c-headers company-ansible color-theme auctex aggressive-indent))))
+    (ox-rst which-key use-package smartparens scheme-complete restart-emacs rainbow-delimiters racket-mode py-yapf platformio-mode monokai-theme markdown-mode irony-eldoc helm-swoop google-c-style golden-ratio fzf flycheck-irony flx-ido exec-path-from-shell evil-terminal-cursor-changer evil-nerd-commenter evil-magit evil-leader elpy company-statistics color-theme clang-format cdlatex avy auctex aggressive-indent))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

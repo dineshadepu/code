@@ -14,7 +14,7 @@
     url = git@github.com:fniessen/org-html-themes.git
 
     - keep this line on top of the file
-      #+SETUPFILE: /home/dinesh/org-html-themes/setup/theme-bigblow.setup
+      #+SETUPFILE: /home/dinesh/softwares/org-html-themes/setup/theme-bigblow.setup
 
 
 *** Install Emacs 25.1
@@ -136,3 +136,11 @@
     - ~/git-prompt.sh
 
     Which could be found in this directory including bashrc
+
+** Dropbox
+   cd ~ && wget -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
+   ~/.dropbox-dist/dropboxd
+
+** Caps to ctrl key
+    https://askubuntu.com/questions/412576/swap-caps-lock-and-ctrl-in-ubuntu-13-10
+    - sudo apt-get install gnome-tweak-tool
