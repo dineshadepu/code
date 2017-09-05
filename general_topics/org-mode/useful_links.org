@@ -144,3 +144,8 @@
 ** Caps to ctrl key
     https://askubuntu.com/questions/412576/swap-caps-lock-and-ctrl-in-ubuntu-13-10
     - sudo apt-get install gnome-tweak-tool
+
+** Python plotting
+
+   - plt.axes().set_aspect('equal', 'datalim')
+   - for file in *; do mv "$file" `echo $file | tr ' ' '_'` ; done
