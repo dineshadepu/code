@@ -25,6 +25,7 @@
     - sudo apt update
     - sudo apt install emacs25
     - Provided packages for LTS 14.04 and 16.04.
+    - mkdir .emacs.d/tmp
 
 *** Unusual installation behavious
     - do M-x package refresh.
@@ -149,3 +150,7 @@
 
    - plt.axes().set_aspect('equal', 'datalim')
    - for file in *; do mv "$file" `echo $file | tr ' ' '_'` ; done
+
+** Vim installation
+   Instructions
+   - git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
