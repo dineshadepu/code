@@ -36,7 +36,7 @@
 ;; (tool-bar-mode -1)
 ;; (menu-bar-mode -1)
 (global-linum-mode t)
-(global-hl-line-mode t)
+;; (global-hl-line-mode t)
 ;; (setq mac-command-modifier 'meta)
 (setq ns-function-modifier 'control)
 (global-auto-revert-mode 1)
@@ -48,7 +48,7 @@
 (setq x-gtk-use-system-tooltips nil)
 (setq-default indent-tabs-mode nil)
 (global-whitespace-mode -1)
-(global-set-key (kbd "M-x") 'helm-M-x)
+;; (global-set-key (kbd "M-x") 'helm-M-x)
 (define-key global-map [?\s-s] 'save-buffer)
 ;; (global-set-key [(super s)] 'save-buffer)
 
@@ -259,6 +259,7 @@
             (evil-leader/set-key "m" 'windmove-right)
             (evil-leader/set-key "o" 'org-edit-special)
             (evil-leader/set-key "`" 'org-edit-src-exit)
+            (evil-leader/set-key "p" 'org-ref-open-pdf-at-point)
             ;; (evil-leader/set-key "h" 'helm-M-x)
             (evil-leader/set-key "k" 'kill-this-buffer)))
 
@@ -577,6 +578,7 @@
            (elpy-enable)))
 
 
+
 (use-package py-yapf
   :ensure t
   :diminish py-yapf)
@@ -610,11 +612,11 @@
 ;;   (ido-vertical-mode t))
 
 
-;; (use-package smex
-;;   :ensure t
-;;   :bind
-;;   (([remap execute-extended-command] . smex)
-;;    ("M-X" . smex-major-mode-commands)))
+(use-package smex
+  :ensure t
+  :bind
+  (([remap execute-extended-command] . smex)
+   ("M-X" . smex-major-mode-commands)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -667,7 +669,32 @@
 ;; c++ development irony starts here
 
 ;; tags for code navigation
+;; tags for code navigation
 
+(use-package ggtags
+  ;; Use M-. to find a tag.
+  ;; Use M-, to go back
+  :ensure t
+  :config
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+                (ggtags-mode 1))))
+  )
+
+;; @see https://bitbucket.org/lyro/evil/issue/511/let-certain-minor-modes-key-bindings
+(eval-after-load 'ggtags
+  '(progn
+     (evil-make-overriding-map ggtags-mode-map 'normal)
+     ;; force update evil keymaps after ggtags-mode loaded
+     (add-hook 'ggtags-mode-hook #'evil-normalize-keymaps)))
+
+(defun find-tag-no-prompt ()
+  "Jump to the tag at point without prompting"
+  (interactive)
+  (find-tag (find-tag-default)))
+;; don't prompt when finding a tag
+(global-set-key (kbd "M-.") 'find-tag-no-prompt)
 (use-package irony
   :ensure t
   :commands (irony-mode))
@@ -676,10 +703,10 @@
   :ensure t
   :commands (irony-eldoc))
 
-(use-package platformio-mode
-  :ensure t
-  :commands (platformio-conditionally-enable)
-  :config (platformio-setup-compile-buffer))
+;; (use-package platformio-mode
+;;   :ensure t
+;;   :commands (platformio-conditionally-enable)
+;;   :config (platformio-setup-compile-buffer))
 
 (defun irony-and-platformio-hook ()
   (irony-mode)
@@ -949,7 +976,7 @@
                 "pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f"
                 "pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f")))
 
-  (setq org-latex-create-formula-image-program 'imagemagick)
+  ;; (setq org-latex-create-formula-image-program 'imagemagick)
 
   ;; Tell the latex export to use the minted package for source
   ;; code coloration.
@@ -1093,7 +1120,7 @@
   :config
   (evil-escape-mode)
   (setq-default evil-escape-key-sequence "jk")
-  (setq-default evil-escape-delay 0.1)
+  (setq-default evil-escape-delay 0.01)
   )
 
 (use-package undo-tree
@@ -1120,9 +1147,12 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(elpy-modules
+   (quote
+    (elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv elpy-module-yasnippet elpy-module-django elpy-module-sane-defaults)))
  '(package-selected-packages
    (quote
-    (ox-rst which-key use-package smartparens scheme-complete restart-emacs rainbow-delimiters racket-mode py-yapf platformio-mode monokai-theme markdown-mode irony-eldoc helm-swoop google-c-style golden-ratio fzf flycheck-irony flx-ido exec-path-from-shell evil-terminal-cursor-changer evil-nerd-commenter evil-magit evil-leader elpy company-statistics color-theme clang-format cdlatex avy auctex aggressive-indent))))
+    (ggtags vimrc-mode evil-vimish-fold ox-rst which-key use-package smartparens scheme-complete restart-emacs rainbow-delimiters racket-mode py-yapf platformio-mode monokai-theme markdown-mode irony-eldoc helm-swoop google-c-style golden-ratio fzf flycheck-irony flx-ido exec-path-from-shell evil-terminal-cursor-changer evil-nerd-commenter evil-magit evil-leader elpy company-statistics color-theme clang-format cdlatex avy auctex aggressive-indent))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
