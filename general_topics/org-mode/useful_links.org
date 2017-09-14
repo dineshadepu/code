@@ -154,3 +154,26 @@
 ** Vim installation
    Instructions
    - git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+   - PluginInstall
+
+
+** Ctags
+   To generate
+   - ctags -e -R .
+
+** Irony mode
+   Install following, all using sudo apt-get
+   - clang
+   - cmake
+   - global
+   Very important
+   - sudo apt-get install libclang-dev
+
+** Resize unity launcher
+   - https://askubuntu.com/questions/18345/how-to-resize-the-unity-launcher
+   - In Appearance, down to it.
+
+** On focus change window.
+   In unity tweak tool.
+   - go to windows
+   - Change 5th option.
