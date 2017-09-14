@@ -168,6 +168,7 @@
    - global
    Very important
    - sudo apt-get install libclang-dev
+   - sudo apt-get install clang-format
 
 ** Resize unity launcher
    - https://askubuntu.com/questions/18345/how-to-resize-the-unity-launcher
@@ -177,3 +178,15 @@
    In unity tweak tool.
    - go to windows
    - Change 5th option.
+
+
+
+** Ubuntu installation
+   Three parts
+   - swap ()
+   - home (/home) (250000 mb)
+   - root (/) (250000 mb)
+
+** pull from original forked repository
+   git pull https://github.com/ORIGINAL_OWNER/ORIGINAL_REPOSITORY.git
+      BRANCH_NAME

@@ -257,6 +257,8 @@
             (evil-leader/set-key "z" 'fzf)
             (evil-leader/set-key "n" 'windmove-left)
             (evil-leader/set-key "m" 'windmove-right)
+            (evil-leader/set-key "<SPC>" 'windmove-down)
+            (evil-leader/set-key "u" 'windmove-up)
             (evil-leader/set-key "o" 'org-edit-special)
             (evil-leader/set-key "`" 'org-edit-src-exit)
             (evil-leader/set-key "p" 'org-ref-open-pdf-at-point)
@@ -421,11 +423,11 @@
   :config
   (company-statistics-mode))
 
-;; (use-package company-c-headers
-;;   :ensure t
-;;   :config
-;;   (add-to-list 'company-c-headers-path-system "/usr/include/c++/5/")
-;;   (add-to-list 'company-backend 'company-c-headers))
+(use-package company-c-headers
+  :ensure t
+  :config
+  (add-to-list 'company-c-headers-path-system "/usr/include/c++/5/")
+  (add-to-list 'company-backend 'company-c-headers))
 
 (define-key company-active-map (kbd "C-n") 'company-select-next)
 (define-key company-active-map (kbd "C-p") 'company-select-previous)
@@ -695,6 +697,7 @@
   (find-tag (find-tag-default)))
 ;; don't prompt when finding a tag
 (global-set-key (kbd "M-.") 'find-tag-no-prompt)
+
 (use-package irony
   :ensure t
   :commands (irony-mode))
@@ -702,19 +705,6 @@
 (use-package irony-eldoc
   :ensure t
   :commands (irony-eldoc))
-
-;; (use-package platformio-mode
-;;   :ensure t
-;;   :commands (platformio-conditionally-enable)
-;;   :config (platformio-setup-compile-buffer))
-
-(defun irony-and-platformio-hook ()
-  (irony-mode)
-  (irony-eldoc)
-  (platformio-conditionally-enable))
-
-(add-hook 'c-mode-hook 'irony-and-platformio-hook)
-(add-hook 'c++-mode-hook 'irony-and-platformio-hook)
 
 (defun irony-use-async-ac ()
   (define-key irony-mode-map [remap completion-at-point]
@@ -753,7 +743,32 @@
 ;; ------------------------------------------------
 
 
+;; ------------------------------------------------
+;; ------------------------------------------------
+;; C++ DEVELOPMENT, DIFFERENRT with RTAGS starts
+(use-package counsel-gtags
+  :ensure)
+(add-hook 'c-mode-hook 'counsel-gtags-mode)
+(add-hook 'c++-mode-hook 'counsel-gtags-mode)
 
+(with-eval-after-load 'counsel-gtags
+  (define-key counsel-gtags-mode-map (kbd "M-t") 'counsel-gtags-find-definition)
+  (define-key counsel-gtags-mode-map (kbd "M-r") 'counsel-gtags-find-reference)
+  (define-key counsel-gtags-mode-map (kbd "M-s") 'counsel-gtags-find-symbol)
+  (define-key counsel-gtags-mode-map (kbd "M-,") 'counsel-gtags-go-backward))
+
+(setenv "GTAGSLIBPATH" (concat "/usr/include"
+                               ":"
+                               (file-truename "~/proj2")
+                               ":"
+                               (file-truename "~/proj1")))
+(setenv "MAKEOBJDIRPREFIX" (file-truename "~/obj/"))
+;; (setq company-backends '((company-dabbrev-code company-gtags)))
+;; ------------------------------------------------
+;; ------------------------------------------------
+;; C++ DEVELOPMENT, DIFFERENRT with RTAGS ends
+;; ------------------------------------------------
+;; ------------------------------------------------
 
 ;; (use-package rust-mode
 ;;   :ensure t
@@ -1152,7 +1167,7 @@
     (elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv elpy-module-yasnippet elpy-module-django elpy-module-sane-defaults)))
  '(package-selected-packages
    (quote
-    (ggtags vimrc-mode evil-vimish-fold ox-rst which-key use-package smartparens scheme-complete restart-emacs rainbow-delimiters racket-mode py-yapf platformio-mode monokai-theme markdown-mode irony-eldoc helm-swoop google-c-style golden-ratio fzf flycheck-irony flx-ido exec-path-from-shell evil-terminal-cursor-changer evil-nerd-commenter evil-magit evil-leader elpy company-statistics color-theme clang-format cdlatex avy auctex aggressive-indent))))
+    (counsel-gtags counsel-gtags-mode ggtags vimrc-mode evil-vimish-fold ox-rst which-key use-package smartparens scheme-complete restart-emacs rainbow-delimiters racket-mode py-yapf platformio-mode monokai-theme markdown-mode irony-eldoc helm-swoop google-c-style golden-ratio fzf flycheck-irony flx-ido exec-path-from-shell evil-terminal-cursor-changer evil-nerd-commenter evil-magit evil-leader elpy company-statistics color-theme clang-format cdlatex avy auctex aggressive-indent))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
