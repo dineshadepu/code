@@ -184,9 +184,13 @@
 ** Ubuntu installation
    Three parts
    - swap ()
-   - home (/home) (250000 mb)
+   - home (/home) (750000 mb)
    - root (/) (250000 mb)
 
 ** pull from original forked repository
    git pull https://github.com/ORIGINAL_OWNER/ORIGINAL_REPOSITORY.git
       BRANCH_NAME
+
+** yapf style
+   - mkdir .config/yapf
+   - wget https://raw.githubusercontent.com/dineshadepu/dotfiles/master/.config/yapf/style

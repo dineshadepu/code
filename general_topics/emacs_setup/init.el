@@ -770,51 +770,46 @@
 ;; ------------------------------------------------
 ;; ------------------------------------------------
 
-;; (use-package rust-mode
-;;   :ensure t
-;;   :defer t)
+(use-package rust-mode
+  :ensure t
+  :defer t)
 
-;; (use-package flycheck-rust
-;;   :ensure t
-;;   :defer t
-;;   :init (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+(use-package flycheck-rust
+  :ensure t
+  :defer t
+  :init (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
 
-;; (use-package flycheck-package
-;;   :load-path "~/.emacs.d/elisp/flycheck-package/"
-;;   :init (with-eval-after-load 'flycheck (flycheck-package-setup)))
+(use-package flycheck-package
+  :ensure t
+  :init (with-eval-after-load 'flycheck (flycheck-package-setup)))
 
 ;; rust mode stars here
 
-;; (use-package racer
-;; :ensure t
-;; :load-path "~/.emacs.d/elisp/emacs-racer/"
-;; :bind
-;; (:map evil-normal-state-map
-;;       ("M-," .  racer-find-definition))
-;; :config
-;; (add-hook 'rust-mode-hook #'racer-mode)
-;; (add-hook 'racer-mode-hook #'eldoc-mode))
+(use-package racer
+  :ensure t
+  :load-path "~/.emacs.d/elisp/emacs-racer/"
+  :bind
+  (:map evil-normal-state-map
+        ("M-," .  racer-find-definition))
+  :config
+  (add-hook 'rust-mode-hook #'racer-mode)
+  (add-hook 'racer-mode-hook #'eldoc-mode))
 
-;; (use-package emacs-rustfmt
-;;   :ensure t
-;;   :load-path "~/.emacs.d/elisp/emacs-rustfmt/"
-;;   :config
-;;   (add-hook 'rust-mode-hook #'rustfmt-enable-on-save))
+(use-package toml-mode
+  :ensure t)
 
-;; (defun my-rust-mode-hooks ()
-;;   (add-hook 'before-save-hook 'rustfmt-format-buffer)
-;;   )
-;; (add-hook 'rust-mode-hook 'my-rust-mode-hooks)
+(use-package clang-format
+  :ensure t)
 
-;; (use-package rustfmt
-;;   :config
-;;   (define-key rust-mode-map (kbd "C-c C-f") #'rustfmt-format-buffer))
+(use-package cargo
+  :ensure t)
+(add-hook 'rust-mode-hook 'cargo-minor-mode)
 
-;; (use-package toml-mode
-;;   :ensure t)
-
-;; (use-package clang-format
-;;   :ensure t)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Rust ends
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (use-package smartparens
@@ -1129,14 +1124,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;      ORG-MODE ends    ;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package evil-escape
-  :diminish evil-escape-mode
+(use-package key-chord
+  :ensure t
+  :diminish key-chord-mode
   :config
-  (evil-escape-mode)
-  (setq-default evil-escape-key-sequence "jk")
-  (setq-default evil-escape-delay 0.01)
-  )
+  (key-chord-mode 1)
+  (setq key-chord-two-keys-delay 0.5)
+  (key-chord-define evil-insert-state-map "jk" 'evil-normal-state))
 
 (use-package undo-tree
   :diminish undo-tree-mode)
@@ -1167,7 +1161,7 @@
     (elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv elpy-module-yasnippet elpy-module-django elpy-module-sane-defaults)))
  '(package-selected-packages
    (quote
-    (counsel-gtags counsel-gtags-mode ggtags vimrc-mode evil-vimish-fold ox-rst which-key use-package smartparens scheme-complete restart-emacs rainbow-delimiters racket-mode py-yapf platformio-mode monokai-theme markdown-mode irony-eldoc helm-swoop google-c-style golden-ratio fzf flycheck-irony flx-ido exec-path-from-shell evil-terminal-cursor-changer evil-nerd-commenter evil-magit evil-leader elpy company-statistics color-theme clang-format cdlatex avy auctex aggressive-indent))))
+    (flycheck-package evil-escape cargo counsel-gtags counsel-gtags-mode ggtags vimrc-mode evil-vimish-fold ox-rst which-key use-package smartparens scheme-complete restart-emacs rainbow-delimiters racket-mode py-yapf platformio-mode monokai-theme markdown-mode irony-eldoc helm-swoop google-c-style golden-ratio fzf flycheck-irony flx-ido exec-path-from-shell evil-terminal-cursor-changer evil-nerd-commenter evil-magit evil-leader elpy company-statistics color-theme clang-format cdlatex avy auctex aggressive-indent))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
