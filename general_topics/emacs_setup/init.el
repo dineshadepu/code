@@ -31,7 +31,6 @@
   (package-install 'use-package))
 
 ;;; UI
-
 ;; (setq inhibit-startup-message t)
 ;; (tool-bar-mode -1)
 ;; (menu-bar-mode -1)
@@ -79,6 +78,9 @@
 
 (setq temporary-file-directory "~/.emacs.d/tmp/")
 
+
+;; Bookmarks file in dropbox.
+(setq bookmark-default-file "~/Dropbox/common/emacs/bookmarks.bmk" bookmark-save-flag 1)
 ;; White space astropy
 ;; Remove trailing whitespace manually by typing C-t C-w.
 (add-hook 'python-mode-hook
@@ -259,7 +261,7 @@
             (evil-leader/set-key "m" 'windmove-right)
             (evil-leader/set-key "<SPC>" 'windmove-down)
             (evil-leader/set-key "u" 'windmove-up)
-            (evil-leader/set-key "o" 'org-edit-special)
+            (evil-leader/set-key "o" 'org-ref-open-bibtex-notes)
             (evil-leader/set-key "`" 'org-edit-src-exit)
             (evil-leader/set-key "p" 'org-ref-open-pdf-at-point)
             ;; (evil-leader/set-key "h" 'helm-M-x)
@@ -770,9 +772,40 @@
 ;; ------------------------------------------------
 ;; ------------------------------------------------
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Rust starts
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package rust-mode
   :ensure t
-  :defer t)
+  :diminish t)
+
+(use-package racer
+  :ensure t
+  ;; :load-path "~/.emacs.d/elisp/emacs-racer/"
+  :bind
+  (:map evil-normal-state-map
+        ("M-," .  racer-find-definition))
+  :config
+  (add-hook 'rust-mode-hook #'racer-mode)
+  (add-hook 'racer-mode-hook #'eldoc-mode))
+;; evil leader for go to definition
+(evil-leader/set-key-for-mode 'rust-mode "," 'racer-find-definition)
+
+(setq racer-cmd "~/.cargo/bin/racer")
+(setq racer-rust-src-path "/home/dinesh/.multirust/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src")
+
+(add-hook 'rust-mode-hook #'racer-mode)
+(add-hook 'racer-mode-hook #'eldoc-mode)
+(add-hook 'racer-mode-hook #'company-mode)
+
+(require 'rust-mode)
+(define-key rust-mode-map (kbd "TAB")  #'company-indent-or-complete-common)
+(setq company-tooltip-align-annotations t)
+
+
 
 (use-package flycheck-rust
   :ensure t
@@ -783,17 +816,7 @@
   :ensure t
   :init (with-eval-after-load 'flycheck (flycheck-package-setup)))
 
-;; rust mode stars here
 
-(use-package racer
-  :ensure t
-  :load-path "~/.emacs.d/elisp/emacs-racer/"
-  :bind
-  (:map evil-normal-state-map
-        ("M-," .  racer-find-definition))
-  :config
-  (add-hook 'rust-mode-hook #'racer-mode)
-  (add-hook 'racer-mode-hook #'eldoc-mode))
 
 (use-package toml-mode
   :ensure t)
@@ -1129,7 +1152,7 @@
   :diminish key-chord-mode
   :config
   (key-chord-mode 1)
-  (setq key-chord-two-keys-delay 0.5)
+  (setq key-chord-two-keys-delay 0.1)
   (key-chord-define evil-insert-state-map "jk" 'evil-normal-state))
 
 (use-package undo-tree
@@ -1156,12 +1179,14 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(column-number-mode t)
  '(elpy-modules
    (quote
     (elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv elpy-module-yasnippet elpy-module-django elpy-module-sane-defaults)))
  '(package-selected-packages
    (quote
-    (flycheck-package evil-escape cargo counsel-gtags counsel-gtags-mode ggtags vimrc-mode evil-vimish-fold ox-rst which-key use-package smartparens scheme-complete restart-emacs rainbow-delimiters racket-mode py-yapf platformio-mode monokai-theme markdown-mode irony-eldoc helm-swoop google-c-style golden-ratio fzf flycheck-irony flx-ido exec-path-from-shell evil-terminal-cursor-changer evil-nerd-commenter evil-magit evil-leader elpy company-statistics color-theme clang-format cdlatex avy auctex aggressive-indent))))
+    (flycheck-package evil-escape cargo counsel-gtags counsel-gtags-mode ggtags vimrc-mode evil-vimish-fold ox-rst which-key use-package smartparens scheme-complete restart-emacs rainbow-delimiters racket-mode py-yapf platformio-mode monokai-theme markdown-mode irony-eldoc helm-swoop google-c-style golden-ratio fzf flycheck-irony flx-ido exec-path-from-shell evil-terminal-cursor-changer evil-nerd-commenter evil-magit evil-leader elpy company-statistics color-theme clang-format cdlatex avy auctex aggressive-indent)))
+ '(size-indication-mode t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

@@ -34,6 +34,10 @@
 
 
 *** Install Dropbox.
+    Installation
+    - cd ~ && wget -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
+    Auto start
+    - keep /home/dinesh/.dropbox-dist/dropboxd in start up applications.
 
 *** Install latex
 
@@ -194,3 +198,22 @@
 ** yapf style
    - mkdir .config/yapf
    - wget https://raw.githubusercontent.com/dineshadepu/dotfiles/master/.config/yapf/style
+
+
+** gitignore global
+    https://stackoverflow.com/questions/7335420/global-git-ignore
+    - git config --global core.excludesfile '~/.gitignore_global'
+
+** Guake
+   - sudo apt install guake
+
+
+** Rust emacs
+   - Install source code.
+     rustup source code.
+   - cargo install racer
+
+** vim rust
+   - https://github.com/ivanceras/rust-vim-setup
+   - Auto completion
+        https://valloric.github.io/YouCompleteMe/
