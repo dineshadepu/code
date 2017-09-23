@@ -217,3 +217,7 @@
    - https://github.com/ivanceras/rust-vim-setup
    - Auto completion
         https://valloric.github.io/YouCompleteMe/
+
+** IP addresses
+   - ajay - 10.101.202.119
+   - personal desktop - 10.101.202.181
