@@ -250,6 +250,10 @@ export GIT_PS1_SHOWDIRTYSTATE=1
 # '\$(__git_ps1)' adds git-related stuff
 # '\W' adds the name of the current directory
 
+# original prompt
+# export PS1="$purple\u@ADA$green\$(__git_ps1)$blue \W $ $reset \n| ADA => "
+
+# modified one
 export PS1="\[\033[36m\]\u\[\033[m\]@\[\033[32m\] \[\033[33;1m\]\w\[\033[m\] (\$(git branch 2>/dev/null | grep '^*' | colrm 1 2)) \$  \n| => "
 export PS2="| => "
 # PATH=/usr/racket/bin:$PATH
