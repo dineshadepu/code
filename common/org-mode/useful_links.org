@@ -221,3 +221,10 @@
 ** IP addresses
    - ajay - 10.101.202.119
    - personal desktop - 10.101.202.181
+
+** Make video from images
+https://stackoverflow.com/questions/13590976/python-make-a-video-using-several-png-images
+   - ffmpeg -f image2 -r 1/1 -i frame%06d.png -vcodec mpeg4 -y movie.mp4
+
+*** Make a gif using images
+    convert -resize 768x576 -delay 20 -loop 0 movie/*.png myimage.gif

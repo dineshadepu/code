@@ -55,7 +55,7 @@
 (setq make-backup-files nil)
 
 ;; open recently closed files
-(desktop-save-mode 1)
+;; (desktop-save-mode 1)
 
 ;; hash or pound key
 (global-set-key (kbd "M-3") '(lambda () (interactive) (insert "#")))
@@ -106,6 +106,14 @@
 
 (global-set-key (kbd "C-x K") 'nuke-all-buffers)
 
+(defun kill-other-buffers ()
+  (interactive)
+  (dolist (buffer (buffer-list))
+    (unless (or (eql buffer (current-buffer)) )
+      (kill-buffer buffer))))
+
+(global-set-key (kbd "C-x L") 'kill-other-buffers)
+
 ;; Copy to clipboard
 ;; (defun copy-from-osx ()
 ;;   (shell-command-to-string "pbpaste"))
@@ -144,10 +152,10 @@
   (exec-path-from-shell-initialize))
 
 ;; Provides all the racket support
-(use-package racket-mode
-  :ensure t)
+;; (use-package racket-mode
+;;   :ensure t)
 
-(use-package scheme-complete :ensure t)
+;; (use-package scheme-complete :ensure t)
 
 ;; (use-package rainbow-identifiers
 ;;   :ensure t
@@ -196,6 +204,18 @@
 
 ;; -------------------------------------------
 ;; -------------------------------------------
+
+
+;; -------------------------------------------
+;; -------------------------------------------
+;; -----------Emacs rocks configuration-------
+(use-package dired-details
+  :ensure t
+  :init
+  (setq-default dired-details-hidden-string "--- ")
+  (setq dired-dwim-target t)
+  )
+(dired-details-install)
 
 ;; Aliases
 (defalias 'yes-or-no-p 'y-or-n-p)
@@ -510,6 +530,18 @@
               ("M-n" . yas-next-field)
               ("C-g" . abort-company-or-yas)))
 
+;; ---------------------------------------------------
+;; ---------------------------------------------------
+;; ------eshell settings------------------------------
+(defun my-shell-hook ()
+  (local-set-key "\C-cl" 'erase-buffer))
+
+(add-hook 'shell-mode-hook 'my-shell-hook)
+(add-hook 'eshell-mode-hook (lambda() (company-mode 0)))
+;; ---------------------------------------------------
+;; ---------------------------------------------------
+;; ------eshell settings end------------------------------
+
 (use-package markdown-mode
   :ensure t
   :commands (markdown-mode gfm-mode)
@@ -572,7 +604,7 @@
   :diminish elpy-mode
   :config(progn
            (defalias 'workon 'pyvenv-workon)
-           ;; (elpy-use-cpython "/usr/local/bin/python3")
+           ;; (elpy-use-cpython "$HOME/.virtualenvs/sph/bin")
            ;; (setq elpy-rpc-python-command "python3")
            ;; (setq 'python-indent-offset 4)
            (setq company-minimum-prefix-length 1)
@@ -581,6 +613,10 @@
            ;; (elpy-clean-modeline)
            (elpy-enable)))
 
+(use-package virtualenv
+  :ensure)
+(let ((virtualenv-workon-starts-python nil))
+  (virtualenv-workon "sph"))
 
 
 (use-package py-yapf
@@ -784,6 +820,7 @@
 
 (use-package racer
   :ensure t
+  :diminish t
   ;; :load-path "~/.emacs.d/elisp/emacs-racer/"
   :bind
   (:map evil-normal-state-map
@@ -825,8 +862,13 @@
   :ensure t)
 
 (use-package cargo
-  :ensure t)
+  :ensure t
+  :diminish t)
 (add-hook 'rust-mode-hook 'cargo-minor-mode)
+
+(use-package rg
+  :ensure t
+  :diminish t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1152,7 +1194,7 @@
   :diminish key-chord-mode
   :config
   (key-chord-mode 1)
-  (setq key-chord-two-keys-delay 0.1)
+  (setq key-chord-two-keys-delay 0.2)
   (key-chord-define evil-insert-state-map "jk" 'evil-normal-state))
 
 (use-package undo-tree
@@ -1174,6 +1216,64 @@
 ;;                 (5 . rst-level-5-face)
 ;;                 (nil . rst-level-5-face))))
 ;;   :mode (("\\.rst$" . rst-mode)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; xml files
+(use-package nxml-mode
+  :mode (("\\.gpx\\'" . nxml-mode)
+         ("\\.plist\\'" . nxml-mode)
+         ("\\.rng\\'" . nxml-mode)
+         ("\\.rss\\'" . nxml-mode)
+         ("\\.sch\\'" . nxml-mode)
+         ("\\.svg\\'" . nxml-mode)
+         ("\\.tcx\\'" . nxml-mode)
+         ("\\.xml\\'" . nxml-mode)
+         ("\\.xsd\\'" . nxml-mode)
+         ("\\.xslt\\'" . nxml-mode))
+
+  :init
+  (setq
+   magic-mode-alist (cons '("<\\?xml " . nxml-mode) magic-mode-alist)
+   nxml-slash-auto-complete-flag t)
+
+  (add-hook
+   'nxml-mode-hook
+   (lambda () (set (make-local-variable 'ido-use-filename-at-point) nil)))
+
+  (fset 'xml-mode 'nxml-mode))
+
+(use-package tidy
+  :commands (tidy-buffer tidy-current-line)
+  :init
+  (add-hook 'nxml-mode-hook (lambda () (tidy-build-menu nxml-mode-map))))
+;; http://sinewalker.wordpress.com/2008/06/26/pretty-printing-xml-with-emacs-nxml-mode/
+
+(defun jcf-pp-xml-region (begin end)
+  "Pretty format XML markup in region. The function inserts linebreaks
+to separate tags that have nothing but whitespace between them.  It
+then indents the markup by using nxml's indentation rules."
+  (interactive "r")
+  (save-excursion
+    (nxml-mode)
+    (goto-char begin)
+    (while (search-forward-regexp "\>[ \\t]*\<" nil t)
+      (backward-char) (insert "\n"))
+    (indent-region begin end)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; xml files ends
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(use-package neotree
+  :ensure)
+(global-set-key (kbd "M-n")  'neotree-toggle)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -1185,7 +1285,7 @@
     (elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv elpy-module-yasnippet elpy-module-django elpy-module-sane-defaults)))
  '(package-selected-packages
    (quote
-    (flycheck-package evil-escape cargo counsel-gtags counsel-gtags-mode ggtags vimrc-mode evil-vimish-fold ox-rst which-key use-package smartparens scheme-complete restart-emacs rainbow-delimiters racket-mode py-yapf platformio-mode monokai-theme markdown-mode irony-eldoc helm-swoop google-c-style golden-ratio fzf flycheck-irony flx-ido exec-path-from-shell evil-terminal-cursor-changer evil-nerd-commenter evil-magit evil-leader elpy company-statistics color-theme clang-format cdlatex avy auctex aggressive-indent)))
+    (dired-details rg neotree flycheck-package evil-escape cargo counsel-gtags counsel-gtags-mode ggtags vimrc-mode evil-vimish-fold ox-rst which-key use-package smartparens scheme-complete restart-emacs rainbow-delimiters racket-mode py-yapf platformio-mode monokai-theme markdown-mode irony-eldoc helm-swoop google-c-style golden-ratio fzf flycheck-irony flx-ido exec-path-from-shell evil-terminal-cursor-changer evil-nerd-commenter evil-magit evil-leader elpy company-statistics color-theme clang-format cdlatex avy auctex aggressive-indent)))
  '(size-indication-mode t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
