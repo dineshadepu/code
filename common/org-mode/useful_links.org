@@ -221,6 +221,7 @@
 ** IP addresses
    - ajay - 10.101.202.119
    - personal desktop - 10.101.202.181
+   - ssh ada - 10.101.2.23
 
 ** Make video from images
 https://stackoverflow.com/questions/13590976/python-make-a-video-using-several-png-images
