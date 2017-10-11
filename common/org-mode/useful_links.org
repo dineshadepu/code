@@ -228,3 +228,7 @@ https://stackoverflow.com/questions/13590976/python-make-a-video-using-several-p
 
 *** Make a gif using images
     convert -resize 768x576 -delay 20 -loop 0 movie/*.png myimage.gif
+
+
+** rsync
+   rsync -Parv dinesh@10.101.2.23:/home/dinesh/pysph/pysph ./
