@@ -20,6 +20,11 @@
       (append package-archives
               '(("melpa" . "http://melpa.milkbox.net/packages/"))))
 
+(setq package-archives
+      '(("melpa" . "https://melpa.org/packages/")
+        ("gnu" . "https://elpa.gnu.org/packages/")
+        ("org" . "http://orgmode.org/elpa/")))
+(package-initialize)
 ;; (setq package-archives
 ;;       '(("elpa" . "http://elpa.gnu.org/packages/")
 ;;         ("melpa-stable" . "http://stable.melpa.org/packages/")
@@ -31,8 +36,8 @@
   (package-install 'use-package))
 
 ;;; UI
-;; (setq inhibit-startup-message t)
-;; (tool-bar-mode -1)
+(setq inhibit-startup-message t)
+(tool-bar-mode -1)
 ;; (menu-bar-mode -1)
 (global-linum-mode t)
 ;; (global-hl-line-mode t)
@@ -77,6 +82,9 @@
 (use-package f)
 
 (setq temporary-file-directory "~/.emacs.d/tmp/")
+
+;; set font size
+(set-face-attribute 'default nil :height 140)
 
 
 ;; Bookmarks file in dropbox.
@@ -609,6 +617,7 @@
            ;; (setq 'python-indent-offset 4)
            (setq company-minimum-prefix-length 1)
            (setq python-shell-completion-native-enable nil)
+           (setq elpy-rpc-timeout 10)
            ;; (elpy-use-ipython)
            ;; (elpy-clean-modeline)
            (elpy-enable)))
@@ -870,6 +879,11 @@
   :ensure t
   :diminish t)
 
+;; snippets
+(add-to-list 'load-path "/home/dinesh/.emacs.d/elpa/rust-snippets/")
+(autoload 'rust-snippets/initialize "rust-snippets")
+(eval-after-load 'yasnippet
+  '(rust-snippets/initialize))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Rust ends
@@ -972,121 +986,6 @@
 (use-package org-ref-bibtex
   :after org)
 
-(use-package org
-  :defer t
-  :bind (("C-c a" . org-agenda)
-         ("C-c c" . org-capture)
-         ("C-c l" . org-store-link))
-  :config
-  (require 'ox-md)
-  (unbind-key "C-c ;" org-mode-map)
-
-  ;;file to save todo items
-  (setq org-agenda-files (quote ("~/Dropbox/Research/todo.org")))
-
-
-  ;;set priority range from A to C with default A
-  (setq org-highest-priority ?A)
-  (setq org-lowest-priority ?C)
-  (setq org-default-priority ?A)
-
-
-  ;;set colours for priorities
-  (setq org-priority-faces '((?A . (:foreground "OliveDrab" :weight bold))
-                             (?B . (:foreground "LightSteelBlue"))
-                             (?C . (:foreground "#F0DFAF"))))
-
-
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;; org-mode agenda options                                                ;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;open agenda in current window
-  (setq org-agenda-window-setup (quote current-window))
-  ;;warn me of any deadlines in next 7 days
-  (setq org-deadline-warning-days 7)
-
-  ;;don't show tasks as scheduled if they are already shown as a deadline
-  (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
-  ;;don't give awarning colour to tasks with impending deadlines
-  ;;if they are scheduled to be done
-  (setq org-agenda-skip-deadline-prewarning-if-scheduled (quote pre-scheduled))
-  ;;don't show tasks that are scheduled or have deadlines in the
-  ;;normal todo list
-  (setq org-agenda-todo-ignore-deadlines (quote all))
-  (setq org-agenda-todo-ignore-scheduled (quote all))
-
-  ;;sort tasks in order of when they are due and then by priority
-
-  (setq org-agenda-sorting-strategy
-        (quote
-         ((agenda deadline-up priority-down)
-          (todo priority-down category-keep)
-          (tags priority-down category-keep)
-          (search category-keep))))
-
-  (setq org-capture-templates
-        '(("t" "todo" entry (file+headline "~/Dropbox/Research/todo.org" "Tasks")
-           "* TODO [#A] %?\nSCHEDULED: %(org-insert-time-stamp (org-read-date nil t \"+0d\"))\n")))
-
-
-  (setq org-todo-keywords
-        (quote ((sequence "TODO(t)" "|" "CANCELLED(c@/!)" "DONE(d)"))))
-
-  (setq org-use-fast-todo-selection t)
-  (setq org-treat-S-cursor-todo-selection-as-state-change nil)
-
-  (setq org-todo-keyword-faces
-        '(("TODO" . (:foreground "green" :weight bold))
-          ("NEXT" :foreground "blue" :weight bold)
-          ("WAITING" :foreground "orange" :weight bold)
-          ("HOLD" :foreground "magenta" :weight bold)
-          ("CANCELLED" :foreground "forest green" :weight bold)))
-
-  (setq org-enforce-todo-dependencies t)
-  ;; (setq org-src-tab-acts-natively t)
-
-  (setq org-latex-pdf-process
-        (quote ("pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f"
-                "bibtex $(basename %b)"
-                "pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f"
-                "pdflatex -interaction nonstopmode -shell-escape -output-directory %o %f")))
-
-  ;; (setq org-latex-create-formula-image-program 'imagemagick)
-
-  ;; Tell the latex export to use the minted package for source
-  ;; code coloration.
-  (add-to-list 'org-latex-packages-alist '("" "minted"))
-  (require 'ox-latex)
-  (setq org-latex-listings 'minted)
-
-  ;; (setq org-latex-minted-options
-  ;;       '(("frame" "lines") ("framesep" "6pt")
-  ;;         ("mathescape" "true") ("fontsize" "\\small")))
-
-  (setq org-confirm-babel-evaluate nil)
-
-  ;; execute external programs.
-  (org-babel-do-load-languages
-   (quote org-babel-load-languages)
-   (quote ((emacs-lisp . t)
-           (dot . t)
-           (ditaa . t)
-           (python . t)
-           (ruby . t)
-           (gnuplot . t)
-           (clojure . t)
-           (haskell . t)
-           (octave . t)
-           (org . t)
-           (plantuml . t)
-           (scala . t)
-           (sql . t)
-           (latex . t))))
-
-  (eval-after-load 'org-src
-    '(define-key org-src-mode-map
-       "\C-x\C-s" #'org-edit-src-exit)))
-
 ;; Taken from
 ;; https://github.com/bixuanzju/emacs.d/blob/master/emacs-init.org
 ;; ends
@@ -1186,6 +1085,12 @@
 
 (add-hook 'LaTeX-mode-hook 'turn-on-cdlatex)   ; with AUCTeX LaTeX mode
 (add-hook 'latex-mode-hook 'turn-on-cdlatex)   ; with Emacs latex mode
+
+;; The following lines are always needed.  Choose your own keys.
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cc" 'org-capture)
+(global-set-key "\C-cb" 'org-iswitchb)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;      ORG-MODE ends    ;;;;;;;;;;;;;;;;;;;;;;;
@@ -1274,6 +1179,10 @@ then indents the markup by using nxml's indentation rules."
   :ensure)
 (global-set-key (kbd "M-n")  'neotree-toggle)
 
+(use-package vimrc-mode
+  :ensure t)
+(add-to-list 'auto-mode-alist '("\\.vim\\(rc\\)?\\'" . vimrc-mode))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -1285,7 +1194,7 @@ then indents the markup by using nxml's indentation rules."
     (elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv elpy-module-yasnippet elpy-module-django elpy-module-sane-defaults)))
  '(package-selected-packages
    (quote
-    (dired-details rg neotree flycheck-package evil-escape cargo counsel-gtags counsel-gtags-mode ggtags vimrc-mode evil-vimish-fold ox-rst which-key use-package smartparens scheme-complete restart-emacs rainbow-delimiters racket-mode py-yapf platformio-mode monokai-theme markdown-mode irony-eldoc helm-swoop google-c-style golden-ratio fzf flycheck-irony flx-ido exec-path-from-shell evil-terminal-cursor-changer evil-nerd-commenter evil-magit evil-leader elpy company-statistics color-theme clang-format cdlatex avy auctex aggressive-indent)))
+    (rust-snippets org vim-mode vim dired-details rg neotree flycheck-package evil-escape cargo counsel-gtags counsel-gtags-mode ggtags vimrc-mode evil-vimish-fold ox-rst which-key use-package smartparens scheme-complete restart-emacs rainbow-delimiters racket-mode py-yapf platformio-mode monokai-theme markdown-mode irony-eldoc helm-swoop google-c-style golden-ratio fzf flycheck-irony flx-ido exec-path-from-shell evil-terminal-cursor-changer evil-nerd-commenter evil-magit evil-leader elpy company-statistics color-theme clang-format cdlatex avy auctex aggressive-indent)))
  '(size-indication-mode t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

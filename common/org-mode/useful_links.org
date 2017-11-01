@@ -9,6 +9,9 @@
     url = git@github.com:yyr/yasnippets-orgmode.git
 
 
+*** Org title bug
+    - C-u M-x org-reload
+
 *** Awesome html conversion.
 
     url = git@github.com:fniessen/org-html-themes.git
@@ -212,6 +215,9 @@
    - Install source code.
      rustup source code.
    - cargo install racer
+
+*** snippets
+    git clone git@github.com:freebroccolo/rust-snippets.git
 
 ** vim rust
    - https://github.com/ivanceras/rust-vim-setup
