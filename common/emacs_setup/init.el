@@ -336,6 +336,7 @@
 
 (use-package magit
   :ensure t)
+(global-auto-revert-mode t)
 
 
 (use-package evil-magit
@@ -833,12 +834,30 @@
   ;; :load-path "~/.emacs.d/elisp/emacs-racer/"
   :bind
   (:map evil-normal-state-map
-        ("M-," .  racer-find-definition))
+        ("M-." .  racer-find-definition)
+        )
   :config
   (add-hook 'rust-mode-hook #'racer-mode)
   (add-hook 'racer-mode-hook #'eldoc-mode))
 ;; evil leader for go to definition
 (evil-leader/set-key-for-mode 'rust-mode "," 'racer-find-definition)
+
+(defun racer-find-definition-other-window ()
+  "Run the racer find-definition command and process the results in other window."
+  (interactive)
+  (-if-let (match (--first (s-starts-with? "MATCH" it)
+                           (racer--call-at-point "find-definition")))
+      (-let [(_name line col file _matchtype _ctx)
+             (s-split-up-to "," (s-chop-prefix "MATCH " match) 5)]
+        (if (fboundp 'xref-push-marker-stack)
+            (xref-push-marker-stack)
+          (with-no-warnings
+            (ring-insert find-tag-marker-ring (point-marker))))
+        (switch-to-buffer-other-window file)
+        (save-selected-window
+          (racer--find-file file (string-to-number line) (string-to-number col))))
+    (error "No definition found")))
+(evil-leader/set-key-for-mode 'rust-mode "." 'racer-find-definition-other-window)
 
 (setq racer-cmd "~/.cargo/bin/racer")
 (setq racer-rust-src-path "/home/dinesh/.multirust/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src")
@@ -986,111 +1005,21 @@
 (use-package org-ref-bibtex
   :after org)
 
-;; Taken from
-;; https://github.com/bixuanzju/emacs.d/blob/master/emacs-init.org
-;; ends
-
-
-;; org mode configuration mainly agenda
-(define-key global-map "\C-cl" 'org-store-link)
-(define-key global-map "\C-ca" 'org-agenda)
-(setq org-log-done t)
-;; load all files from a directory in org agenda
-(load-library "find-lisp")
-(setq org-agenda-files
-      (find-lisp-find-files "~/code/" "\.org$"))
-
-;; org time clock
-(setq org-clock-persist 'history)
-(org-clock-persistence-insinuate)
-
-;; cross-reference, bibliography, glossary, and index manager
-;; initially written by the creator of Org Mode
-(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-
-;; Org babel load languages
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((latex . t)))
-
-(use-package async
-  :ensure t)
-(provide 'async-org-babel)
-
-
-;; ipython for org mode
-(use-package ob-ipython
-  :ensure t
-  :init
-  )
-
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '(
-   ;; (sh         . t)
-   (js         . t)
-   (emacs-lisp . t)
-   (perl       . t)
-   (scala      . t)
-   (clojure    . t)
-   (python     . t)
-   (ruby       . t)
-   (ditaa . t)
-   (dot . t)
-   (plantuml . t)
-   (gnuplot . t)
-   (dot        . t)
-   (css        . t)
-   (plantuml   . t)))
-
-;; fontify code in code blocks
-;; dont ask permission to run
-(setq org-confirm-babel-evaluate nil
-      org-src-fontify-natively t)
-
-(setq org-latex-packages-alist
-      (quote (("" "color" t)
-              ("" "minted" t)
-              ("" "parskip" t)
-              ("" "tikz" t))))
-
-(setq org-latex-create-formula-image-program 'imagemagick)
-
-
-;; bibtex entries for org mode and everything.
-(use-package helm-bibtex
-  :ensure t
-  :config)
-
-;; org ref installation and configurations starts.
-(use-package org-ref
-  :ensure t
-  :config)
-
-;; Open pdf's in evince.
-(eval-after-load "org"
-  '(progn
-     ;; .txt files aren't in the list initially, but in case that changes
-     ;; in a future version of org, use if to avoid errors
-     (if (assoc "\\.txt\\'" org-file-apps)
-         (setcdr (assoc "\\.txt\\'" org-file-apps) "notepad.exe %s")
-       (add-to-list 'org-file-apps '("\\.txt\\'" . "notepad.exe %s") t))
-     ;; Change .pdf association directly within the alist
-     (setcdr (assoc "\\.pdf\\'" org-file-apps) "evince %s")))
-
-;; Turn on cdlatex
-(use-package cdlatex
-  :ensure t
-  :config)
-
-(add-hook 'LaTeX-mode-hook 'turn-on-cdlatex)   ; with AUCTeX LaTeX mode
-(add-hook 'latex-mode-hook 'turn-on-cdlatex)   ; with Emacs latex mode
 
 ;; The following lines are always needed.  Choose your own keys.
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-cb" 'org-iswitchb)
+
+(use-package ox-reveal
+  :ensure ox-reveal)
+
+(setq org-reveal-root "http://cdn.jsdelivr.net/reveal.js/3.0.0/")
+(setq org-reveal-mathjax t)
+
+;; (use-package htmlize
+;;   :ensure t)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;      ORG-MODE ends    ;;;;;;;;;;;;;;;;;;;;;;;
@@ -1123,65 +1052,12 @@
 ;;   :mode (("\\.rst$" . rst-mode)))
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; xml files
-(use-package nxml-mode
-  :mode (("\\.gpx\\'" . nxml-mode)
-         ("\\.plist\\'" . nxml-mode)
-         ("\\.rng\\'" . nxml-mode)
-         ("\\.rss\\'" . nxml-mode)
-         ("\\.sch\\'" . nxml-mode)
-         ("\\.svg\\'" . nxml-mode)
-         ("\\.tcx\\'" . nxml-mode)
-         ("\\.xml\\'" . nxml-mode)
-         ("\\.xsd\\'" . nxml-mode)
-         ("\\.xslt\\'" . nxml-mode))
 
-  :init
-  (setq
-   magic-mode-alist (cons '("<\\?xml " . nxml-mode) magic-mode-alist)
-   nxml-slash-auto-complete-flag t)
-
-  (add-hook
-   'nxml-mode-hook
-   (lambda () (set (make-local-variable 'ido-use-filename-at-point) nil)))
-
-  (fset 'xml-mode 'nxml-mode))
-
-(use-package tidy
-  :commands (tidy-buffer tidy-current-line)
-  :init
-  (add-hook 'nxml-mode-hook (lambda () (tidy-build-menu nxml-mode-map))))
-;; http://sinewalker.wordpress.com/2008/06/26/pretty-printing-xml-with-emacs-nxml-mode/
-
-(defun jcf-pp-xml-region (begin end)
-  "Pretty format XML markup in region. The function inserts linebreaks
-to separate tags that have nothing but whitespace between them.  It
-then indents the markup by using nxml's indentation rules."
-  (interactive "r")
-  (save-excursion
-    (nxml-mode)
-    (goto-char begin)
-    (while (search-forward-regexp "\>[ \\t]*\<" nil t)
-      (backward-char) (insert "\n"))
-    (indent-region begin end)))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; xml files ends
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-(use-package neotree
-  :ensure)
-(global-set-key (kbd "M-n")  'neotree-toggle)
-
-(use-package vimrc-mode
+(use-package powerline
   :ensure t)
-(add-to-list 'auto-mode-alist '("\\.vim\\(rc\\)?\\'" . vimrc-mode))
+(powerline-center-evil-theme)
+
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -1194,7 +1070,7 @@ then indents the markup by using nxml's indentation rules."
     (elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv elpy-module-yasnippet elpy-module-django elpy-module-sane-defaults)))
  '(package-selected-packages
    (quote
-    (rust-snippets org vim-mode vim dired-details rg neotree flycheck-package evil-escape cargo counsel-gtags counsel-gtags-mode ggtags vimrc-mode evil-vimish-fold ox-rst which-key use-package smartparens scheme-complete restart-emacs rainbow-delimiters racket-mode py-yapf platformio-mode monokai-theme markdown-mode irony-eldoc helm-swoop google-c-style golden-ratio fzf flycheck-irony flx-ido exec-path-from-shell evil-terminal-cursor-changer evil-nerd-commenter evil-magit evil-leader elpy company-statistics color-theme clang-format cdlatex avy auctex aggressive-indent)))
+    (powerline rust-snippets org vim-mode vim dired-details rg neotree flycheck-package evil-escape cargo counsel-gtags counsel-gtags-mode ggtags vimrc-mode evil-vimish-fold ox-rst which-key use-package smartparens scheme-complete restart-emacs rainbow-delimiters racket-mode py-yapf platformio-mode monokai-theme markdown-mode irony-eldoc helm-swoop google-c-style golden-ratio fzf flycheck-irony flx-ido exec-path-from-shell evil-terminal-cursor-changer evil-nerd-commenter evil-magit evil-leader elpy company-statistics color-theme clang-format cdlatex avy auctex aggressive-indent)))
  '(size-indication-mode t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
