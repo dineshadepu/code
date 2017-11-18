@@ -239,3 +239,33 @@ https://stackoverflow.com/questions/13590976/python-make-a-video-using-several-p
 
 ** rsync
    rsync -Parv dinesh@10.101.2.23:/home/dinesh/pysph/pysph ./
+
+
+* Writing thesis in org mode
+  - Add report to a path where latex can find it.
+
+    #+NAME: report_cls
+    #+BEGIN_SRC sh
+        sudo cp iitbreport.cls /usr/share/texlive/texmf-dist/tex/latex/base/
+        sudo mktexlsr
+        kpsewhich iitbreport.cls
+    #+END_SRC
+
+  - Add latex class to emacs
+    #+NAME: org_class
+    #+BEGIN_SRC elisp
+        (add-to-list 'org-latex-classes
+                    '("iitbreport"
+                    "\\documentclass{iitbreport} "
+                    ("\\chapter{%s}" . "\\chapter*{%s}")
+                    ("\\section{%s}" . "\\section*{%s}")
+                    ("\\subsection{%s}" . "\\subsection*{%s}")
+                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+    #+END_SRC
+
+  - Use it in your report as a latex header
+    #+BEGIN_EXAMPLE
+    #+LaTeX_CLASS: iitbreport
+    #+END_EXAMPLE

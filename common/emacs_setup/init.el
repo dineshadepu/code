@@ -60,7 +60,7 @@
 (setq make-backup-files nil)
 
 ;; open recently closed files
-;; (desktop-save-mode 1)
+(desktop-save-mode 1)
 
 ;; hash or pound key
 (global-set-key (kbd "M-3") '(lambda () (interactive) (insert "#")))
@@ -260,7 +260,7 @@
          ([left]     . windmove-left)
          ([right]    . windmove-right)
          ([up]       . windmove-up)
-         ([down]     . windmove-down)))
+         ))
 
 
 (use-package evil-leader
@@ -281,7 +281,7 @@
             (evil-leader/set-key "," 'elpy-goto-definition)
             (evil-leader/set-key "f" 'ff-find-other-file)
             (evil-leader/set-key "r" 'recentf-open-files)
-            (evil-leader/set-key "c" 'tramp-cleanup-all-connections)
+            (evil-leader/set-key "c" 'org-ref-helm-insert-ref-link)
             (evil-leader/set-key "w" 'ispell-word)
             (evil-leader/set-key "g" 'magit-status)
             (evil-leader/set-key "z" 'fzf)
@@ -602,9 +602,9 @@
 
 (use-package tex
   :ensure auctex
-  :config
+  :config)
   ;; (setq TeX-show-compilation t)
-  (add-hook 'LaTeX-mode-hook 'predictive-mode))
+
 
 
 (use-package elpy
@@ -625,8 +625,8 @@
 
 (use-package virtualenv
   :ensure)
-(let ((virtualenv-workon-starts-python nil))
-  (virtualenv-workon "sph"))
+;; (let ((virtualenv-workon-starts-python nil))
+;;   (virtualenv-workon "sph"))
 
 
 (use-package py-yapf
@@ -842,23 +842,6 @@
 ;; evil leader for go to definition
 (evil-leader/set-key-for-mode 'rust-mode "," 'racer-find-definition)
 
-(defun racer-find-definition-other-window ()
-  "Run the racer find-definition command and process the results in other window."
-  (interactive)
-  (-if-let (match (--first (s-starts-with? "MATCH" it)
-                           (racer--call-at-point "find-definition")))
-      (-let [(_name line col file _matchtype _ctx)
-             (s-split-up-to "," (s-chop-prefix "MATCH " match) 5)]
-        (if (fboundp 'xref-push-marker-stack)
-            (xref-push-marker-stack)
-          (with-no-warnings
-            (ring-insert find-tag-marker-ring (point-marker))))
-        (switch-to-buffer-other-window file)
-        (save-selected-window
-          (racer--find-file file (string-to-number line) (string-to-number col))))
-    (error "No definition found")))
-(evil-leader/set-key-for-mode 'rust-mode "." 'racer-find-definition-other-window)
-
 (setq racer-cmd "~/.cargo/bin/racer")
 (setq racer-rust-src-path "/home/dinesh/.multirust/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src")
 
@@ -994,6 +977,8 @@
         bibtex-autokey-titlewords-stretch 1
         bibtex-autokey-titleword-length 5))
 
+(setq org-ref-default-ref-type "eqref")
+;; (org-defkey org-mode-map ["C-c M-x"] 'org-ref-helm-insert-ref-link)
 (use-package org-autolist
   :after org
   :config
@@ -1018,8 +1003,107 @@
 (setq org-reveal-root "http://cdn.jsdelivr.net/reveal.js/3.0.0/")
 (setq org-reveal-mathjax t)
 
-;; (use-package htmlize
-;;   :ensure t)
+(plist-put org-format-latex-options :scale 1.5)
+
+(add-to-list 'org-latex-packages-alist
+             '("" "tikz" t))
+(setq org-export-latex-hyperref-format "\\ref{%s}")
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '(
+   (sh . t)
+   (python . t)
+   (ditaa . t)
+   (latex . t)
+   (C . t)
+   (ipython . t)
+   ))
+
+;; don't ask for security
+(defun my-org-confirm-babel-evaluate (lang body)
+  (not (member lang '("python" "latex" "sh" "ipython"))))
+
+(setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+
+(eval-after-load "org"
+  '(progn
+     ;; .txt files aren't in the list initially, but in case that changes
+     ;; in a future version of org, use if to avoid errors
+     (if (assoc "\\.txt\\'" org-file-apps)
+         (setcdr (assoc "\\.txt\\'" org-file-apps) "notepad.exe %s")
+       (add-to-list 'org-file-apps '("\\.txt\\'" . "notepad.exe %s") t))
+     ;; Change .pdf association directly within the alist
+     (setcdr (assoc "\\.pdf\\'" org-file-apps) "evince %s")))
+
+(setq org-latex-listings 'minted
+      org-latex-packages-alist '(("" "minted"))
+      org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
+(add-to-list 'company-backends 'company-ob-ipython)
+
+;; (setq org-confirm-babel-evaluate nil)   ;don't prompt me to confirm everytime I want to evaluate a block
+
+;;; display/update images in the buffer after I evaluate
+(add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
+(add-to-list 'org-latex-minted-langs '(ipython "python"))
+
+(setq org-latex-to-pdf-process (list "latexmk -pdf %f"))
+(use-package htmlize
+  :commands (htmlize-buffer
+             htmlize-file
+             htmlize-many-files
+             htmlize-many-files-dired
+             htmlize-region))
+
+(setq ob-ipython-resources-dir "~/tmp/")
+
+;; org mode lateX export with reference
+(setq org-latex-pdf-process '("latexmk -pdflatex='%latex -shell-escape -interaction nonstopmode' -pdf -output-directory=%o -f %f"))
+(use-package org-bullets
+  :ensure t)
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+
+;; cdlatex mode on
+(use-package cdlatex
+  :ensure t)
+(add-hook 'org-mode-hook 'turn-on-org-cdlatex)
+
+
+;; org latex classes
+(with-eval-after-load 'ox-latex
+  (add-to-list 'org-latex-classes
+               '("report"
+                 "\\documentclass{report}"
+                 ("\\chapter{%s}" . "\\chapter*{%s}")
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+
+;; (with-eval-after-load 'ox-latex
+;;   (add-to-list 'org-latex-classes
+;;                '("phd"
+;;                  "\\documentclass{iitbreport}"
+;;                  ("\\chapter{%s}" . "\\chapter*{%s}")
+;;                  ("\\section{%s}" . "\\section*{%s}")
+;;                  ("\\subsection{%s}" . "\\subsection*{%s}")
+;;                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+;;                  ("\\paragraph{%s}" . "\\paragraph*{%s}")
+;;                  ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+
+(add-to-list 'org-latex-classes
+             '("iitbreport"
+               "\\documentclass{iitbreport} "
+               ("\\chapter{%s}" . "\\chapter*{%s}")
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;      ORG-MODE ends    ;;;;;;;;;;;;;;;;;;;;;;;
@@ -1051,7 +1135,41 @@
 ;;                 (nil . rst-level-5-face))))
 ;;   :mode (("\\.rst$" . rst-mode)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;; ; predictive mode;;;;;;;;;;;; ;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; (add-to-list 'load-path "~/.emacs.d/elisp/predictive/")
+;; (add-to-list 'load-path "/home/dinesh/.emacs.d/predictive")
+;; (add-to-list 'load-path "/home/dinesh/.emacs.d/predictive/misc")
+;; (add-to-list 'load-path "/home/dinesh/.emacs.d/predictive/texinfo")
+;; (add-to-list 'load-path "/home/dinesh/.emacs.d/predictive/html")
+;; (add-to-list 'load-path "/home/dinesh/.emacs.d/predictive/latex")
+;; (require 'predictive)
 
+
+;; (when (and (featurep 'predictive) (featurep 'company))
+;;   (defun company-predictive (command &optional arg &rest ignored)
+;;     (case command
+;;       (prefix (let* ((text (downcase (word-at-point))))
+;;                 (set-text-properties 0 (length text) nil text)
+;;                 text))
+;;       (candidates (predictive-complete arg))))
+;;   (load "dict-english")
+;;   (add-to-list 'company-backends '(company-predictive)))
+;; (add-hook 'org-mode-hook 'predictive-mode)
+;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; (autoload 'predictive-mode "predictive" "predictive" t)
+;; (set-default 'predictive-auto-add-to-dict t)
+;; (setq predictive-auto-learn t)
+;; (setq predictive-add-to-dict-ask nil)
+;; (setq predictive-use-auto-learn-cache nil)
+;; (setq predictive-which-dict t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;; ; predictive mode ends;;;;;;;;;;;; ;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package powerline
   :ensure t)
@@ -1070,7 +1188,7 @@
     (elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv elpy-module-yasnippet elpy-module-django elpy-module-sane-defaults)))
  '(package-selected-packages
    (quote
-    (powerline rust-snippets org vim-mode vim dired-details rg neotree flycheck-package evil-escape cargo counsel-gtags counsel-gtags-mode ggtags vimrc-mode evil-vimish-fold ox-rst which-key use-package smartparens scheme-complete restart-emacs rainbow-delimiters racket-mode py-yapf platformio-mode monokai-theme markdown-mode irony-eldoc helm-swoop google-c-style golden-ratio fzf flycheck-irony flx-ido exec-path-from-shell evil-terminal-cursor-changer evil-nerd-commenter evil-magit evil-leader elpy company-statistics color-theme clang-format cdlatex avy auctex aggressive-indent)))
+    (ox-latex org-ascii-bullets powerline rust-snippets org vim-mode vim dired-details rg neotree flycheck-package evil-escape cargo counsel-gtags counsel-gtags-mode ggtags vimrc-mode evil-vimish-fold ox-rst which-key use-package smartparens scheme-complete restart-emacs rainbow-delimiters racket-mode py-yapf platformio-mode monokai-theme markdown-mode irony-eldoc helm-swoop google-c-style golden-ratio fzf flycheck-irony flx-ido exec-path-from-shell evil-terminal-cursor-changer evil-nerd-commenter evil-magit evil-leader elpy company-statistics color-theme clang-format cdlatex avy auctex aggressive-indent)))
  '(size-indication-mode t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
