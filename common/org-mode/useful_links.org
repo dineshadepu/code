@@ -269,3 +269,50 @@ https://stackoverflow.com/questions/13590976/python-make-a-video-using-several-p
     #+BEGIN_EXAMPLE
     #+LaTeX_CLASS: iitbreport
     #+END_EXAMPLE
+
+  - Use eqref to cite figures, equation.
+    But name sections chapters using properties.
+
+  - Put the following header at the beginning
+
+    #+BEGIN_EXAMPLE
+    #+LaTeX_CLASS: iitbreport
+    #+OPTIONS: toc:nil
+    #+OPTIONS: author:nil date:nil title:nil
+    #+LaTeX_CLASS_OPTIONS: [twoside, 10pt]
+    #+LATEX_HEADER: \begin{document}
+    #+LATEX_HEADER: \pagenumbering{roman}
+    #+LATEX_HEADER: \setcounter{page}{1}
+    #+LATEX_HEADER: \title{Smoothed Particle Hydrodynamics and Discrete Element Method Coupling}
+    #+LATEX_HEADER: \author{Dinesh A}
+    #+LATEX_HEADER: \reporttype{A Thesis}
+    #+LATEX_HEADER: \degree{Doctor of Philosophy}
+    #+LATEX_HEADER: \dept{Department of Aerospace Engineering}
+    #+LATEX_HEADER: \rollnum{Roll No. 153010009}
+    #+LATEX_HEADER: \maketitle
+
+    #+LATEX_HEADER: \dedication[Dedicated to Self]
+    #+LATEX_HEADER: \makecertificate{seminar report}
+    #+LATEX_HEADER: \include{dec}
+    #+LATEX_HEADER: \include{abs}
+    #+LATEX_HEADER: \notations[4cm]{List of Symbols}
+
+    #+LATEX_HEADER: \makecontents % Creats toc, lof, and lot
+    #+LATEX_HEADER: \pagenumbering{roman}
+
+    #+LATEX_HEADER: \cleardoublepage
+    #+LATEX_HEADER: \setcounter{page}{1}
+
+    #+LATEX_HEADER: \renewcommand\maketitle{}
+
+    #+LATEX: \pagenumbering{arabic}
+    #+END_EXAMPLE
+
+  - To get citations, put *iitbauthyr.bst* in a place where your main
+    report is situated.
+
+    And place these at the end of the file.
+    #+BEGIN_EXAMPLE
+    bibliography:/home/dinesh/Dropbox/Research/references.bib
+    bibliographystyle:./iitbauthyr.bst
+    #+END_EXAMPLE
