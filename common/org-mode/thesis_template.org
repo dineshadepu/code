@@ -1,0 +1,60 @@
+#+LaTeX_CLASS: iitbreport
+#+LaTeX_CLASS: iitbreport
+#+OPTIONS: toc:nil
+#+OPTIONS: author:nil date:nil title:nil
+#+LaTeX_CLASS_OPTIONS: [twoside, 10pt]
+#+LATEX_HEADER: \begin{document}
+#+LATEX_HEADER: \pagenumbering{roman}
+#+LATEX_HEADER: \setcounter{page}{1}
+#+LATEX_HEADER: \title{Smoothed Particle Hydrodynamics and Discrete Element Method Coupling}
+#+LATEX_HEADER: \author{Dinesh A}
+#+LATEX_HEADER: \reporttype{A Dissertation}
+#+LATEX_HEADER: \degree{Doctor of Philosophy}
+#+LATEX_HEADER: \dept{Department of Aerospace Engineering}
+#+LATEX_HEADER: \rollnum{Roll No. 153010009}
+#+LATEX_HEADER: \maketitle
+
+#+LATEX_HEADER: \dedication[Dedicated to *Bale*]
+#+LATEX_HEADER: \makecertificate{dissertation}
+#+LATEX_HEADER: \include{dec}
+#+LATEX_HEADER: \include{abs}
+#+LATEX_HEADER: \notations[4cm]{List of Symbols}
+
+#+LATEX_HEADER: \makecontents % Creats toc, lof, and lot
+#+LATEX_HEADER: \pagenumbering{roman}
+
+#+LATEX_HEADER: \cleardoublepage
+#+LATEX_HEADER: \setcounter{page}{1}
+
+#+LATEX_HEADER: \renewcommand\maketitle{}
+
+#+LATEX: \pagenumbering{arabic}
+* What is this folder?
+  label:ch:1
+
+  My PhD thesis written in Org-mode.  It has all the contents of my
+  PhD, source, docs and run files.
+
+
+* Tips and Tricks
+  label:ch:2
+
+  - To cite a section or figure or a table, first give it a label.
+    Here I am plotting a $sin$ curve using python.
+
+    #+CAPTION: sin vs x in python label:fig:sin
+    #+ATTR_LaTeX: scale=0.75
+    [[./sin.png]]
+
+
+    So in chapter ref:ch:2 using python ref:src:sin  we plotted
+    a figure ref:fig:sin.
+
+    Chapter 1 ref:ch:1 is an introduction of the repository
+
+    cite:price-PhD-2004
+
+
+
+bibliography:/home/dinesh/Dropbox/Research/references.bib
+bibliographystyle:./iitbauthyr.bst

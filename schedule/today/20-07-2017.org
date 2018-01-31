@@ -1,0 +1,16 @@
+#+STARTUP: showeverything
+
+# Mistake date consider.
+* Laplace transforms - EDX.
+  CLOCK: [2017-07-19 Wed 10:56]--[2017-07-19 Wed 11:59] =>  1:03
+  CLOCK: [2017-07-19 Wed 10:45]--[2017-07-19 Wed 10:54] =>  0:09
+
+
+* Rotational dynamics - EDX.
+  CLOCK: [2017-07-19 Wed 13:44]--[2017-07-19 Wed 14:58] =>  1:14
+  CLOCK: [2017-07-19 Wed 12:31]--[2017-07-19 Wed 12:46] =>  0:15
+
+
+* Strength of materials - Timoshenko Text book
+  CLOCK: [2017-07-20 Thu 16:07]--[2017-07-20 Thu 17:12] =>  1:05
+  CLOCK: [2017-07-19 Wed 14:58]--[2017-07-19 Wed 15:06] =>  0:08

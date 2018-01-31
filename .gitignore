@@ -343,3 +343,7 @@ docs/_build/
      *.un~
      *_output/
 /literatureSurvey/porousFlow/porous2008.tex
+*.html
+*.tex
+/general_topics/org-mode/org-html-themes/
+*.setup

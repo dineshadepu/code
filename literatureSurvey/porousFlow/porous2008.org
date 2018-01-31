@@ -15,7 +15,7 @@
   fluid.
 
 * Introduction
-  Fluid-rigid [[http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.3.8713&rep=rep1&type=pdf][Carlson et al]] and fluid-deformable [[http://dl.acm.org/citation.cfm?id=1073299][GUENDELMAN et al.]],
+  Fluid-rigid [[http://citeseerx.ist.psu.edu/viewdoc/download?doi%3D10.1.1.3.8713&rep%3Drep1&type%3Dpdf][Carlson et al 2004]] and fluid-deformable [[http://dl.acm.org/citation.cfm?id=1073299][GUENDELMAN et al. 2005]],
   animations have been done, but mainly considering that the fluid is
   not penetrable in to the body.
 
@@ -33,3 +33,18 @@
   - [[https://www.semanticscholar.org/paper/Modelling-of-Flow-in-Porous-Media-and-Resin-Transf-SAWLEY-CLEARY/0b68cf7ec7527301532c7ad23fede2a4a354b32c][Sawley and cleary 1999]]
   - [[http://www.sciencedirect.com/science/article/pii/S0266352X99000269][Morris 1999]]
   - [[http://onlinelibrary.wiley.com/doi/10.1002/(SICI)1096-9853(19990810)23:9%253C881::AID-NAG996%253E3.0.CO%3B2-K/abstract][Zhu 1999]]
+
+** Previous work
+   Euler papers in the modelling porous body are
+   - Foster and Metaxas 1996 [[http://www.cbim.rutgers.edu/dmdocuments/gmip96%2520Foster.pdf][Realistic animation of liquids]]
+   - Foster and Metaxas 1997 [[http://dl.acm.org/citation.cfm?id%3D792862][Controlling Fluid Animation]]
+   - Stam 1999; [[http://dl.acm.org/citation.cfm?id%3D311548][Stable fluids]]
+   - Foster and Fedkiw 2001 [[http://physbam.stanford.edu/~fedkiw/papers/stanford2001-02.pdf][Practical Animation of Liquids]]
+
+   Since this paper deals with SPH in rigid porous simulation, author
+   cited few good SPH papers in fluid field.
+   - As a first paper Monaghan 2005 for a reference.
+
+   In graphics community SPH was first introduces by Desbrun and Gauscel 1996
+   to simulate highly deformable object. After them Muller 2003, Muller 2005
+   took it forward.

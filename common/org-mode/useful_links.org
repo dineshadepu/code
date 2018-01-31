@@ -1,0 +1,320 @@
+#+TITLE: Useful day to day links are uploaded here
+#+AUTHOR: Dinesh A
+#+DATE:
+#+OPTIONS: toc:nil H:3 num:2
+#+STARTUP: showeverything
+
+*** Yasnippets org mode
+    Here is a better folder for org mode in Emacs
+    url = git@github.com:yyr/yasnippets-orgmode.git
+
+
+*** Org title bug
+    - C-u M-x org-reload
+
+*** Awesome html conversion.
+
+    url = git@github.com:fniessen/org-html-themes.git
+
+    - keep this line on top of the file
+      #+SETUPFILE: /home/dinesh/softwares/org-html-themes/setup/theme-bigblow.setup
+
+
+*** Install Emacs 25.1
+
+    Stable versions (25.1 currently):
+
+    - sudo apt-add-repository -y ppa:adrozdoff/emacs
+    - sudo apt update
+    - sudo apt install emacs25
+    - Provided packages for LTS 14.04 and 16.04.
+    - mkdir .emacs.d/tmp
+
+*** Unusual installation behavious
+    - do M-x package refresh.
+    - And install.
+
+
+
+*** Install Dropbox.
+    Installation
+    - cd ~ && wget -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
+    Auto start
+    - keep /home/dinesh/.dropbox-dist/dropboxd in start up applications.
+
+*** Install latex
+
+
+*** Emacs snapshot version is 26.0.50
+
+
+*** Citing in org-ref
+
+    Citing is easy.
+**** Using doi
+     - Say you have a DOI of a paper.
+     - do M-x doi-add-bibtex-entry
+     - It will automatically add the paper. And will download if it is allowed.
+
+**** Using cross ref
+     - Say we have a title or author or journal of a paper.
+     - Then do, M-x cross-ref-add-bibtex-entry
+     - Paste the title or what ever.
+     - org-ref will search for our paper and gives few suggestions.
+     - Enter on requisite paper.
+     - If you want more then mark all those papers and enter. C-spc.
+
+*** Notes creation from bib file.
+
+**** from bib file
+     Once the bib file is created. We can do
+     - do M-x org-ref-open-bibtex-notes.
+     - It will create a heading named after your file. With citing
+       your bib. And other contents.
+     - Since it is citing your file. Org-ref has awesome functions for
+       clickable citations.
+     - you can go to the link of the citation. Or you can download the pdf
+       from web and many more.
+     - Say, while entering the bib using crossref or doi, our system
+       didn't download the pdf.
+     - Since in clickable link we have a download option it will download
+       it if available.
+     - If our institute is not allowing so. Then we can manually
+       download the pdf.
+     - And don't forget to save it in your default papers storage directory.
+     - And save it as the name as it was cited.
+
+
+
+**** Evil key bindings.
+     - (evil-leader/set-key "p" 'org-ref-open-pdf-at-point)
+     - (evil-leader/set-key "o" 'org-ref-open-bibtex-notes)
+
+
+*** Screen resolution ubuntu fix
+    - xrandr -s 1366x768
+
+*** John Kitchin website links
+    - pip install pycse
+
+
+*** Bashrc configuration
+
+    #+BEGIN_SRC sh
+      # Enable tab completion
+      source ~/git-completion.bash
+      # export PATH="$HOME/miniconda3/bin:$PATH"
+      # colors!
+      green="\[\033[0;32m\]"
+      blue="\[\033[0;34m\]"
+      purple="\[\033[0;35m\]"
+      reset="\[\033[0m\]"
+
+      # Change command prompt
+      source ~/git-prompt.sh
+      export GIT_PS1_SHOWDIRTYSTATE=1
+      # '\u' adds the name of the current user to the prompt
+      # '\$(__git_ps1)' adds git-related stuff
+      # '\W' adds the name of the current directory
+      export PS1="$purple\u$green\$(__git_ps1)$blue \W $ $reset"
+      PATH=/usr/racket/bin:$PATH
+      # export PATH="~/.cargo/bin:$PATH"
+      # export PATH="/home/dinesh/.cask/bin:$PATH"
+      # export PATH="/home/dinesh/.edm/envs/edm/bin:$PATH"
+      bind '"\e[A": history-search-backward'
+      bind '"\e[B": history-search-forward'
+
+      alias ..="cd .."
+      alias ...="cd ..."
+      alias sl="ls"
+      alias l="ls"
+      alias s="ls"
+      alias p="pysph view"
+
+      # added by Miniconda3 4.1.11 installer
+      export PATH="/home/dinesh/anaconda2/bin:$PATH"
+      # export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+      export PATH="/home/dinesh/blender-2.78c-linux-glibc219-x86_64:$PATH"
+      export PATH="/home/dinesh/.edm/envs/edm/bin:$PATH"
+    #+END_SRC
+
+
+    This file depends on two files
+    - ~/git-completion.bash
+    - ~/git-prompt.sh
+
+    Which could be found in this directory including bashrc
+
+** Dropbox
+   cd ~ && wget -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
+   ~/.dropbox-dist/dropboxd
+
+** Caps to ctrl key
+    https://askubuntu.com/questions/412576/swap-caps-lock-and-ctrl-in-ubuntu-13-10
+    - sudo apt-get install gnome-tweak-tool
+
+** Python plotting
+
+   - plt.axes().set_aspect('equal', 'datalim')
+   - for file in *; do mv "$file" `echo $file | tr ' ' '_'` ; done
+
+** Vim installation
+   Instructions
+   - git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+   - PluginInstall
+
+
+** Ctags
+   To generate
+   - ctags -e -R .
+
+** Irony mode
+   Install following, all using sudo apt-get
+   - clang
+   - cmake
+   - global
+   Very important
+   - sudo apt-get install libclang-dev
+   - sudo apt-get install clang-format
+   Gtags completion of system headers
+   - http://shawnleezx.github.io/blog/2015/08/11/on-code-completion-for-c-slash-c-plus-plus/
+
+** Resize unity launcher
+   - https://askubuntu.com/questions/18345/how-to-resize-the-unity-launcher
+   - In Appearance, down to it.
+
+** On focus change window.
+   In unity tweak tool.
+   - go to windows
+   - Change 5th option.
+
+
+
+** Ubuntu installation
+   Three parts
+   - swap ()
+   - home (/home) (750000 mb)
+   - root (/) (250000 mb)
+
+** pull from original forked repository
+   git pull https://github.com/ORIGINAL_OWNER/ORIGINAL_REPOSITORY.git
+      BRANCH_NAME
+
+** yapf style
+   - mkdir .config/yapf
+   - wget https://raw.githubusercontent.com/dineshadepu/dotfiles/master/.config/yapf/style
+
+
+** gitignore global
+    https://stackoverflow.com/questions/7335420/global-git-ignore
+    - git config --global core.excludesfile '~/.gitignore_global'
+
+** Guake
+   - sudo apt install guake
+
+
+** Rust emacs
+   - Install source code.
+     rustup source code.
+   - cargo install racer
+
+*** snippets
+    git clone git@github.com:freebroccolo/rust-snippets.git
+
+** vim rust
+   - https://github.com/ivanceras/rust-vim-setup
+   - Auto completion
+        https://valloric.github.io/YouCompleteMe/
+
+** IP addresses
+   - ajay - 10.101.202.119
+   - personal desktop - 10.101.202.181
+   - ssh ada - 10.101.2.23
+
+** Make video from images
+https://stackoverflow.com/questions/13590976/python-make-a-video-using-several-png-images
+   - ffmpeg -f image2 -r 1/1 -i frame%06d.png -vcodec mpeg4 -y movie.mp4
+
+*** Make a gif using images
+    convert -resize 768x576 -delay 20 -loop 0 movie/*.png myimage.gif
+
+
+** rsync
+   rsync -Parv dinesh@10.101.2.23:/home/dinesh/pysph/pysph ./
+
+
+* Writing thesis in org mode
+  - Add report to a path where latex can find it.
+
+    #+NAME: report_cls
+    #+BEGIN_SRC sh
+        sudo cp iitbreport.cls /usr/share/texlive/texmf-dist/tex/latex/base/
+        sudo mktexlsr
+        kpsewhich iitbreport.cls
+    #+END_SRC
+
+  - Add latex class to emacs
+    #+NAME: org_class
+    #+BEGIN_SRC elisp
+        (add-to-list 'org-latex-classes
+                    '("iitbreport"
+                    "\\documentclass{iitbreport} "
+                    ("\\chapter{%s}" . "\\chapter*{%s}")
+                    ("\\section{%s}" . "\\section*{%s}")
+                    ("\\subsection{%s}" . "\\subsection*{%s}")
+                    ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                    ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                    ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+    #+END_SRC
+
+  - Use it in your report as a latex header
+    #+BEGIN_EXAMPLE
+    #+LaTeX_CLASS: iitbreport
+    #+END_EXAMPLE
+
+  - Use eqref to cite figures, equation.
+    But name sections chapters using properties.
+
+  - Put the following header at the beginning
+
+    #+BEGIN_EXAMPLE
+    #+LaTeX_CLASS: iitbreport
+    #+OPTIONS: toc:nil
+    #+OPTIONS: author:nil date:nil title:nil
+    #+LaTeX_CLASS_OPTIONS: [twoside, 10pt]
+    #+LATEX_HEADER: \begin{document}
+    #+LATEX_HEADER: \pagenumbering{roman}
+    #+LATEX_HEADER: \setcounter{page}{1}
+    #+LATEX_HEADER: \title{Smoothed Particle Hydrodynamics and Discrete Element Method Coupling}
+    #+LATEX_HEADER: \author{Dinesh A}
+    #+LATEX_HEADER: \reporttype{A Thesis}
+    #+LATEX_HEADER: \degree{Doctor of Philosophy}
+    #+LATEX_HEADER: \dept{Department of Aerospace Engineering}
+    #+LATEX_HEADER: \rollnum{Roll No. 153010009}
+    #+LATEX_HEADER: \maketitle
+
+    #+LATEX_HEADER: \dedication[Dedicated to Self]
+    #+LATEX_HEADER: \makecertificate{seminar report}
+    #+LATEX_HEADER: \include{dec}
+    #+LATEX_HEADER: \include{abs}
+    #+LATEX_HEADER: \notations[4cm]{List of Symbols}
+
+    #+LATEX_HEADER: \makecontents % Creats toc, lof, and lot
+    #+LATEX_HEADER: \pagenumbering{roman}
+
+    #+LATEX_HEADER: \cleardoublepage
+    #+LATEX_HEADER: \setcounter{page}{1}
+
+    #+LATEX_HEADER: \renewcommand\maketitle{}
+
+    #+LATEX: \pagenumbering{arabic}
+    #+END_EXAMPLE
+
+  - To get citations, put *iitbauthyr.bst* in a place where your main
+    report is situated.
+
+    And place these at the end of the file.
+    #+BEGIN_EXAMPLE
+    bibliography:/home/dinesh/Dropbox/Research/references.bib
+    bibliographystyle:./iitbauthyr.bst
+    #+END_EXAMPLE
