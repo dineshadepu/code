@@ -251,6 +251,7 @@ https://stackoverflow.com/questions/13590976/python-make-a-video-using-several-p
         sudo cp iitbreport.cls /usr/share/texlive/texmf-dist/tex/latex/base/
         sudo mktexlsr
         kpsewhich iitbreport.cls
+        sudo texhash
     #+END_SRC
 
   - Add latex class to emacs
