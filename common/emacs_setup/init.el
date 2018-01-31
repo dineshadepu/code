@@ -19,16 +19,10 @@
 (setq package-archives
       (append package-archives
               '(("melpa" . "http://melpa.milkbox.net/packages/"))))
-
 (setq package-archives
-      '(("melpa" . "https://melpa.org/packages/")
-        ("gnu" . "https://elpa.gnu.org/packages/")
-        ("org" . "http://orgmode.org/elpa/")))
-(package-initialize)
-;; (setq package-archives
-;;       '(("elpa" . "http://elpa.gnu.org/packages/")
-;;         ("melpa-stable" . "http://stable.melpa.org/packages/")
-;;         ("melpa" . "http://melpa.org/packages/")))
+      '(("org" . "http://orgmode.org/elpa/")
+        ("gnu" . "http://elpa.gnu.org/packages/")
+        ("melpa" . "http://melpa.org/packages/")))
 (package-initialize)
 
 (unless (package-installed-p 'use-package)
@@ -247,19 +241,20 @@
         evil-normal-state-cursor '(box "white"))
   :bind (:map
          evil-insert-state-map
-         ([left]     . windmove-left)
-         ([right]    . windmove-right)
-         ([up]       . windmove-up)
-         ([down]     . windmove-down)
+         ([S-left]     . windmove-left)
+         ([S-right]    . windmove-right)
+         ([S-up]     . windmove-up)
+         ([S-down]    . windmove-down)
          ("SPC" . nil)
          :map
          evil-normal-state-map
          (";" . evil-ex)
          (":"	.	evil-repeat-find-char)
          :map    evil-motion-state-map
-         ([left]     . windmove-left)
-         ([right]    . windmove-right)
-         ([up]       . windmove-up)
+         ([S-left]     . windmove-left)
+         ([S-right]    . windmove-right)
+         ([S-up]     . windmove-up)
+         ([S-down]    . windmove-down)
          ))
 
 
@@ -280,18 +275,19 @@
             (evil-leader/set-key "." 'elpy-goto-definition-other-window)
             (evil-leader/set-key "," 'elpy-goto-definition)
             (evil-leader/set-key "f" 'ff-find-other-file)
-            (evil-leader/set-key "r" 'recentf-open-files)
-            (evil-leader/set-key "c" 'org-ref-helm-insert-ref-link)
+            (evil-leader/set-key "c" 'recentf-open-files)
+            (evil-leader/set-key "r" 'org-ref-helm-insert-ref-link)
+            (evil-leader/set-key "l" 'org-ref-helm-insert-label-link)
             (evil-leader/set-key "w" 'ispell-word)
             (evil-leader/set-key "g" 'magit-status)
             (evil-leader/set-key "z" 'fzf)
             (evil-leader/set-key "n" 'windmove-left)
             (evil-leader/set-key "m" 'windmove-right)
             (evil-leader/set-key "<SPC>" 'windmove-down)
-            (evil-leader/set-key "u" 'windmove-up)
+            (evil-leader/set-key "p" 'windmove-up)
             (evil-leader/set-key "o" 'org-ref-open-bibtex-notes)
             (evil-leader/set-key "`" 'org-edit-src-exit)
-            (evil-leader/set-key "p" 'org-ref-open-pdf-at-point)
+            (evil-leader/set-key "u" 'org-ref-open-pdf-at-point)
             ;; (evil-leader/set-key "h" 'helm-M-x)
             (evil-leader/set-key "k" 'kill-this-buffer)))
 
@@ -603,8 +599,7 @@
 (use-package tex
   :ensure auctex
   :config)
-  ;; (setq TeX-show-compilation t)
-
+;; (setq TeX-show-compilation t)
 
 
 (use-package elpy
@@ -613,20 +608,21 @@
   :diminish elpy-mode
   :config(progn
            (defalias 'workon 'pyvenv-workon)
-           ;; (elpy-use-cpython "$HOME/.virtualenvs/sph/bin")
+           ;; (elpy-use-cpython "~/.virtualenvs/sph/bin")
            ;; (setq elpy-rpc-python-command "python3")
            ;; (setq 'python-indent-offset 4)
            (setq company-minimum-prefix-length 1)
            (setq python-shell-completion-native-enable nil)
            (setq elpy-rpc-timeout 10)
+           (setq elpy-rpc-backend "jedi")
            ;; (elpy-use-ipython)
            ;; (elpy-clean-modeline)
            (elpy-enable)))
-
+(add-hook 'python-mode-hook (highlight-indentation-mode 0))
 (use-package virtualenv
   :ensure)
-;; (let ((virtualenv-workon-starts-python nil))
-;;   (virtualenv-workon "sph"))
+(let ((virtualenv-workon-starts-python nil))
+  (virtualenv-workon "sph"))
 
 
 (use-package py-yapf
@@ -749,6 +745,10 @@
 (use-package irony
   :ensure t
   :commands (irony-mode))
+(add-hook 'c++-mode-hook 'irony-mode)
+(add-hook 'c-mode-hook 'irony-mode)
+(add-hook 'objc-mode-hook 'irony-mode)
+(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
 
 (use-package irony-eldoc
   :ensure t
@@ -774,8 +774,9 @@
   :config
   (progn
     (setq clang-format-style "llvm")
-    (add-hook 'c++-mode-hook (lambda () (add-hook 'before-save-hook 'clang-format-buffer nil t)))
-    (add-hook 'c-mode-hook (lambda () (add-hook 'before-save-hook 'clang-format-buffer nil t)))))
+    ))
+;; (add-hook 'c++-mode-hook (lambda () (add-hook 'before-save-hook 'clang-format-buffer nil t)))
+;; (add-hook 'c-mode-hook (lambda () (add-hook 'before-save-hook 'clang-format-buffer nil t)))
 
 (use-package google-c-style
   :ensure t
@@ -785,36 +786,17 @@
     (add-hook 'c-mode-common-hook 'google-set-c-style)
     (add-hook 'c-mode-common-hook 'google-make-newline-indent)))
 
+
+(use-package company-irony-c-headers
+  :ensure t)
+;; Load with `irony-mode` as a grouped backend
+(eval-after-load 'company
+  '(add-to-list
+    'company-backends '(company-irony-c-headers company-irony)))
+
+
 ;; c++ development irony ends here
 
-;; ------------------------------------------------
-;; ------------------------------------------------
-
-
-;; ------------------------------------------------
-;; ------------------------------------------------
-;; C++ DEVELOPMENT, DIFFERENRT with RTAGS starts
-(use-package counsel-gtags
-  :ensure)
-(add-hook 'c-mode-hook 'counsel-gtags-mode)
-(add-hook 'c++-mode-hook 'counsel-gtags-mode)
-
-(with-eval-after-load 'counsel-gtags
-  (define-key counsel-gtags-mode-map (kbd "M-t") 'counsel-gtags-find-definition)
-  (define-key counsel-gtags-mode-map (kbd "M-r") 'counsel-gtags-find-reference)
-  (define-key counsel-gtags-mode-map (kbd "M-s") 'counsel-gtags-find-symbol)
-  (define-key counsel-gtags-mode-map (kbd "M-,") 'counsel-gtags-go-backward))
-
-(setenv "GTAGSLIBPATH" (concat "/usr/include"
-                               ":"
-                               (file-truename "~/proj2")
-                               ":"
-                               (file-truename "~/proj1")))
-(setenv "MAKEOBJDIRPREFIX" (file-truename "~/obj/"))
-;; (setq company-backends '((company-dabbrev-code company-gtags)))
-;; ------------------------------------------------
-;; ------------------------------------------------
-;; C++ DEVELOPMENT, DIFFERENRT with RTAGS ends
 ;; ------------------------------------------------
 ;; ------------------------------------------------
 
@@ -977,7 +959,7 @@
         bibtex-autokey-titlewords-stretch 1
         bibtex-autokey-titleword-length 5))
 
-(setq org-ref-default-ref-type "eqref")
+;; (setq org-ref-default-ref-type "eqref")
 ;; (org-defkey org-mode-map ["C-c M-x"] 'org-ref-helm-insert-ref-link)
 (use-package org-autolist
   :after org
@@ -1012,7 +994,7 @@
 (org-babel-do-load-languages
  'org-babel-load-languages
  '(
-   (sh . t)
+   (shell . t)
    (python . t)
    (ditaa . t)
    (latex . t)
@@ -1095,6 +1077,16 @@
 ;;                  ("\\paragraph{%s}" . "\\paragraph*{%s}")
 ;;                  ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
 
+(with-eval-after-load 'ox-latex
+  (add-to-list 'org-latex-classes
+               '("myarticle"
+                 "\\documentclass{myarticle} "
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+
 (add-to-list 'org-latex-classes
              '("iitbreport"
                "\\documentclass{iitbreport} "
@@ -1104,6 +1096,20 @@
                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                ("\\paragraph{%s}" . "\\paragraph*{%s}")
                ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+(setq org-export-latex-hyperref-format "\\ref{%s}")
+
+;; (setq org-ref-completion-library 'org-ref-ivy-cite)
+
+
+;; write good mode
+(use-package writegood-mode
+  :ensure t)
+(global-set-key "\C-cg" 'writegood-mode)
+(global-set-key "\C-c\C-gg" 'writegood-grade-level)
+(global-set-key "\C-c\C-ge" 'writegood-reading-ease)
+(setq org-clock-persist 'history)
+(org-clock-persistence-insinuate)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;      ORG-MODE ends    ;;;;;;;;;;;;;;;;;;;;;;;
@@ -1176,20 +1182,70 @@
 (powerline-center-evil-theme)
 
 
+(use-package helm-make
+  :ensure t
+  ;; :bind (("C-c m" . helm-make-projectile))
+  :config (setq helm-make-sort-targets t))
+(bind-key "C-c m" 'compile)
+
+(use-package make-mode
+  ;; Configuration of the built-in makefile-mode
+  :init
+  (progn
+    (add-to-list 'auto-mode-alist '("\\Makefile\\'" . makefile-mode))
+    (add-to-list 'auto-mode-alist '("\\.mk\\'" . makefile-mode))
+
+    (font-lock-add-keywords
+     'makefile-mode
+     '(("define" . font-lock-keyword-face)
+       ("endef" . font-lock-keyword-face)
+       ("ifeq" . font-lock-keyword-face)
+       ("ifneq" . font-lock-keyword-face)
+       ("ifdef" . font-lock-keyword-face)
+       ("ifndef" . font-lock-keyword-face)
+       ("else" . font-lock-keyword-face)
+       ("endif" . font-lock-keyword-face)))
+
+    (defun makefile-mode-setup ()
+      (setq whitespace-style '(face tab-mark trailing)))
+
+    (add-hook 'makefile-mode-hook 'linum-mode)
+    (add-hook 'makefile-mode-hook 'makefile-mode-setup)))
+
+(add-hook 'make-mode-hook #'company-mode)
+
+
+;; octave mode
+(add-to-list 'load-path "/home/dinesh/.emacs.d/elisp")
+(autoload 'octave-mode "octave-mod" nil t)
+(setq auto-mode-alist
+      (cons '("\\.m$" . octave-mode) auto-mode-alist))
+
+(add-hook 'octave-mode-hook
+          (lambda ()
+            (abbrev-mode 1)
+            (auto-fill-mode 1)
+            (if (eq window-system 'x)
+                (font-lock-mode 1))))
+(font-lock-add-keywords 'octave-mode
+                        '(("\\<load\\>". font-lock-keyword-face)
+                          ("\\<clear\\>". font-lock-keyword-face)))
+(autoload 'run-octave "octave-inf" nil t)
+;; julia mode
+(use-package julia-mode
+  :ensure t)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(column-number-mode t)
  '(elpy-modules
    (quote
     (elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv elpy-module-yasnippet elpy-module-django elpy-module-sane-defaults)))
  '(package-selected-packages
    (quote
-    (ox-latex org-ascii-bullets powerline rust-snippets org vim-mode vim dired-details rg neotree flycheck-package evil-escape cargo counsel-gtags counsel-gtags-mode ggtags vimrc-mode evil-vimish-fold ox-rst which-key use-package smartparens scheme-complete restart-emacs rainbow-delimiters racket-mode py-yapf platformio-mode monokai-theme markdown-mode irony-eldoc helm-swoop google-c-style golden-ratio fzf flycheck-irony flx-ido exec-path-from-shell evil-terminal-cursor-changer evil-nerd-commenter evil-magit evil-leader elpy company-statistics color-theme clang-format cdlatex avy auctex aggressive-indent)))
- '(size-indication-mode t))
+    (julia-mode julia company-cmake writegood-mode which-key virtualenv vimrc-mode use-package toml-mode smex smartparens rg restart-emacs rainbow-delimiters racer py-yapf powerline ox-reveal org-ref org-bullets ob-ipython neotree monokai-theme markdown-mode irony-eldoc htmlize helm-swoop helm-make google-c-style golden-ratio ggtags fzf flycheck-rust flycheck-package flycheck-irony flx-ido exec-path-from-shell evil-terminal-cursor-changer evil-nerd-commenter evil-magit evil-leader elpy dired-details counsel-gtags company-statistics company-irony-c-headers company-c-headers color-theme clang-format cdlatex cargo avy auctex aggressive-indent))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

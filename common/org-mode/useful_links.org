@@ -176,6 +176,8 @@
    Very important
    - sudo apt-get install libclang-dev
    - sudo apt-get install clang-format
+   Gtags completion of system headers
+   - http://shawnleezx.github.io/blog/2015/08/11/on-code-completion-for-c-slash-c-plus-plus/
 
 ** Resize unity launcher
    - https://askubuntu.com/questions/18345/how-to-resize-the-unity-launcher
