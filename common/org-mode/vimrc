@@ -1,299 +1,482 @@
 set nocompatible              " be iMproved, required
 filetype off                  " required
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""
-"""""""""""""""""""""""""""""""""""""""""""""""""""
-" general settings
+"Plugins-----------------------------------------------------------------------
+call plug#begin('~/.vim/plugged')
 
-" Remove auto commenting
-inoremap <expr> <enter> getline('.') =~ '^\s*//' ? '<enter><esc>S' : '<enter>'
-nnoremap <expr> O getline('.') =~ '^\s*//' ? 'O<esc>S' : 'O'
-nnoremap <expr> o getline('.') =~ '^\s*//' ? 'o<esc>S' : 'o'
+Plug 'SirVer/ultisnips'
+Plug 'davidhalter/jedi-vim'
+Plug 'ervandew/supertab'
+Plug 'Rip-Rip/clang_complete', {'do' : 'make install'}
+Plug 'Chiel92/vim-autoformat'
+Plug 'Shougo/neocomplete.vim'
+Plug 'Yggdroot/indentLine'
+Plug 'jiangmiao/auto-pairs'
+Plug 'junegunn/vim-easy-align'
+Plug 'mhinz/vim-startify'
+Plug 'osyo-manga/vim-over', {'on': 'OverCommandLine'}
+Plug 'scrooloose/nerdtree'
+Plug 'sheerun/vim-polyglot'
 
-"remove highlighting after search
-nnoremap <esc> :noh<return><esc>
+" Syntastic--------------------------------------------------------------------
+function! Installjshint(info)
+    if a:info.status == 'installed' || a:info.force
+        !npm install -g jshint
+    endif
+endfunction
+Plug 'scrooloose/syntastic', { 'do': function('Installjshint') }
 
-" jk to escape
-imap jk <Esc>  
+" YouCompleteMe----------------------------------------------------------------
+"function! BuildYCM(info)
+"if a:info.status == 'installed' || a:info.force
+"!./install.sh
+"endif
+"endfunction
+"Plug 'Valloric/YouCompleteMe', { 'do': function('BuildYCM') }
 
-" enable file types and syntax highlighing
+" Command-t--------------------------------------------------------------------
+
+Plug 'Shougo/vimproc.vim', {'do' : 'make'}
+Plug 'dietsche/vim-lastplace'
+Plug 'eagletmt/ghcmod-vim'
+Plug 'eagletmt/neco-ghc'
+Plug 'flazz/vim-colorschemes'
+Plug 'godlygeek/tabular'
+Plug 'honza/vim-snippets'
+Plug 'junegunn/goyo.vim'
+Plug 'lervag/vimtex'
+Plug 'scrooloose/nerdcommenter'
+Plug 'tmhedberg/SimpylFold'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-sensible'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-unimpaired'
+
+call plug#end()
+
+"------------------------------------------------------------------------------
+" General Settings-------------------------------------------------------------
+"------------------------------------------------------------------------------
+
+filetype plugin indent on
 syntax on
-filetype plugin on
-filetype indent on
-
-" show line numbers
-set number
-
-" basic editor things
-set encoding=utf-8
-set ttyfast
-set showmode
-set showcmd
-set hidden
-set ruler
-set cursorline
-
-" scroll by three lines when cursor moves off screen
-set scrolloff=7
-
-" indentation
-set smartindent
-set tabstop=4
-set shiftwidth=4
-set expandtab
-
-" tabs & buffers
-set showtabline=2
-
-" search
-set ignorecase
-set smartcase
-set gdefault
-
-" swap files location
-set backupdir=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
-set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
-
-" wrapping
-set wrap
-set textwidth=79
-set formatoptions=qrn1
-
-" backspace bullshit
+set autoindent
 set backspace=indent,eol,start
+set clipboard=unnamedplus,autoselect
+set cmdheight=1
+set completeopt+=menuone,longest
+set completeopt-=preview
+set efm+=\ (%l)\ error:\ %m
+set encoding=utf-8
+set expandtab
+set foldlevel=99
+set foldmethod=indent
+set formatoptions=qrn1t
+set hidden
+set history=1000
+set ignorecase
+set incsearch
+set laststatus=2
+set pumheight=15
+set ruler
+set scrolloff=3
+set shell=/bin/bash
+set shiftwidth=4
+set showcmd
+set showmode
+set smarttab
+set softtabstop=4
+set spelllang=en
+set statusline=%<%f\ %h%m%r%=%-14.(%l,%c%V%)\ %P
+set tabstop=4
+set textwidth=79
+set ttyfast
+set undofile
+set undolevels=500
+set visualbell
+set wrap
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""
-"""""""""""""""""""""""""""""""""""""""""""""""""""
-" general settings ends
-"""""""""""""""""""""""""""""""""""""""""""""""""""
-"""""""""""""""""""""""""""""""""""""""""""""""""""
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-" alternatively, pass a path where Vundle should install plugins
-"call vundle#begin('~/some/path/here')
+" Autocomplete Menus {{{
+if has("wildmenu")
+    set wildignore+=*.a,*.o
+    set wildignore+=*.bmp,*.gif,*.ico,*.jpg,*.png
+    set wildignore+=.DS_Store,.git,.hg,.svn
+    set wildignore+=*~,*.swp,*.tmp
+    set wildmenu
+    if has("wildignorecase")
+        set wildignorecase
+    endif
+    set wildmode=longest:full,full
+    set wildcharm=<tab>
+endif
 
-" let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
+"------------------------------------------------------------------------------
+" Asthetics--------------------------------------------------------------------
+" -----------------------------------------------------------------------------
+set t_Co=256
+set background=dark
+colorscheme molokai
 
-" The following are examples of different formats supported.
-" Keep Plugin commands between vundle#begin/end.
-" plugin on GitHub repo
-Plugin 'tpope/vim-fugitive'
-" plugin from http://vim-scripts.org/vim/scripts.html
-" Plugin 'L9'
-" Git plugin not hosted on GitHub
-" Plugin 'git://git.wincent.com/command-t.git'
-" git repos on your local machine (i.e. when working on your own plugin)
-" Plugin 'file:///home/gmarik/path/to/plugin'
-" The sparkup vim script is in a subdirectory of this repo called vim.
-" Pass the path to set the runtimepath properly.
-Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
-" Install L9 and avoid a Naming conflict if you've already installed a
-" different version somewhere else.
-" Plugin 'ascenator/L9', {'name': 'newL9'}
+" Highlights / Colors {{{
+function! s:apply_highlights()
+    " No tildes for empty lines
+    hi clear NonText | hi NonText
+                \
+                \ ctermfg=darkgrey guifg=darkgrey
+                \
 
-" All of your Plugins must be added before the following line
-call vundle#end()            " required
-filetype plugin indent on    " required
-" To ignore plugin indent changes, instead use:
-"filetype plugin on
-"
-" Brief help
-" :PluginList       - lists configured plugins
-" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-" :PluginSearch foo - searches for foo; append `!` to refresh local cache
-" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
-"
-" see :h vundle for more details or wiki for FAQ
-" Put your non-Plugin stuff after this line
+    " Keep colors in visual
+    hi clear Visual | hi Visual
+                \
+                \ ctermfg=white guifg=white
+                \ ctermbg=red guibg=red
 
-" utilities
-Plugin 'benmills/vimux'
-Plugin 'tpope/vim-commentary' " comment/uncomment lines with gcc or gc in visual mode
+    " Matching delimiter color
+    hi clear MatchParen | hi MatchParen
+                \ cterm=bold
+                \ ctermfg=172
+                \ ctermbg=NONE
 
-" colorschemes
-Plugin 'chriskempson/base16-vim'
+    " Terms
+    hi clear Search | hi Search
+                \
+                \ ctermfg=black  guifg=black
+                \ ctermbg=yellow guibg=yellow
+    hi clear Todo | hi Todo
+                \ cterm=bold  gui=bold
+                \ ctermfg=red guifg=red
+                \ ctermbg=NONE  guibg=NONE
+    hi clear Error | hi Error
+                \ cterm=reverse gui=reverse
+                \ ctermfg=red   guifg=red
+                \ ctermbg=black guibg=black
+    hi clear SpellBad | hi SpellBad
+                \ term=underline cterm=underline gui=underline
+                \ ctermfg=red    guifg=red
+                \
+    hi clear SpellCap | hi SpellCap
+                \ term=underline cterm=underline gui=underline
+                \
+                \
+    hi clear SpellLocal | hi SpellLocal
+                \ term=underline cterm=underline gui=underline
+                \
+                \
+    hi clear SpellRare | hi SpellRare
+                \ term=underline cterm=underline gui=underline
+                \
+                \
 
-" ctrlp added
-Plugin 'ctrlpvim/ctrlp.vim'
-let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlP'
+    hi clear VertSplit | hi VertSplit
+                \
+                \ ctermfg=white guifg=white
+                \ ctermbg=black guibg=black
 
-" syntax checker
-Plugin 'vim-syntastic/syntastic'
+    " Status line
+    hi clear StatusLine | hi StatusLine
+                \ term=bold     cterm=bold  gui=bold
+                \ ctermfg=white guifg=white
+                \ ctermbg=black guibg=black
+    hi clear StatusLineNC | hi StatusLineNC
+                \ term=bold        cterm=bold     gui=bold
+                \ ctermfg=darkgrey guifg=darkgrey
+                \ ctermbg=black    guibg=black
 
+    " Folds
+    hi clear Folded | hi Folded
+                \
+                \ ctermfg=blue guifg=blue
+                \
+    hi clear FoldColumn | hi FoldColumn
+                \
+                \ ctermbg=NONE guibg=NONE
+                \
 
-" nerd commenter
-Plugin 'scrooloose/nerdcommenter'
+    " Diffs
+    hi clear DiffAdd | hi DiffAdd
+                \
+                \ ctermfg=green guifg=green
+                \
+    hi clear DiffChange | hi DiffChange
+                \
+                \ ctermfg=yellow guifg=yellow
+                \
+    hi clear DiffDelete | hi DiffDelete
+                \
+                \ ctermfg=red guifg=red
+                \
 
-" remap
+    " Completion menu
+    hi clear Pmenu | hi Pmenu
+                \
+                \ ctermfg=white guifg=black
+                \ ctermbg=black guibg=blue
+    hi clear PmenuSel | hi PmenuSel
+                \ term=bold     cterm=bold  gui=bold
+                \ ctermfg=white guifg=white
+                \ ctermbg=blue  guibg=blue
+    hi clear PmenuSbar | hi PmenuSbar
+                \
+                \
+                \ ctermbg=white guibg=white
+    hi clear PmenuThumb | hi PmenuThumb
+                \
+                \
+                \ ctermbg=red guibg=blue
+endfunction
+
+if !has('gui_running')
+    call s:apply_highlights()
+    augroup CUSTOM_COLORS
+        au!
+        au ColorScheme * call s:apply_highlights()
+    augroup END
+endif
+
+" Highlight tabs and spaces----------------------------------------------------
+highlight SpecialKey ctermfg=9
+set list
+
+" General Key Bindings---------------------------------------------------------
+"------------------------------------------------------------------------------
+" Map Leader to comma
+let mapleader = ","
+
+" Swap ; and :
 noremap ; :
 noremap : ;
 
-" auto complete
-Plugin 'Valloric/YouCompleteMe'
-let g:ycm_global_ycm_extra_conf = "~/.vim/.ycm_extra_conf.py"
-let g:ycm_key_list_select_completion=[]
-let g:ycm_key_list_previous_completion=[]
-inoremap <expr> <CR> pumvisible() ? "\<C-Y>" : "\<CR>"
+" Indent
+noremap > >>
+noremap < <<
 
-" nerd tree
-Plugin 'scrooloose/nerdtree'
+nnoremap <silent> <bslash> <esc>:%s/
+vnoremap <silent> <bslash> <esc>gv:s/
 
-"CTRL-t to toggle tree view with CTRL-t
-nnoremap <C-e> :NERDTreeToggle<CR>
-nmap <silent> <C-t> :NERDTreeToggle<CR>
-"Set F2 to put the cursor to the nerdtree
-nmap <silent> <F2> :NERDTreeFind<CR>
+" Q - Replay macro
+noremap Q @q
 
 
+" Recenter the keys
+nmap G Gzz
+nmap N Nzz
+nmap n nzz
+nmap { {zz
+nmap } }zz
 
-" " " " " " " " " " " " " " " " " " " " " " " " " " " " " " "
-" " " " " " " " " " " " " " " " " " " " " " " " " " " " " " "
-" rust lang
-Plugin 'rust-lang/rust.vim.git'
-let g:ycm_rust_src_path="/home/dinesh/.multirust/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src"
-Plugin 'racer-rust/vim-racer'
+inoremap <F1> <ESC>
+nnoremap <F1> <ESC>
+vnoremap <F1> <ESC>
 
-set hidden
-let g:racer_cmd ="/home/dinesh/.cargo/bin/racer"
-au FileType rust nmap gd <Plug>(rust-def)
-au FileType rust nmap gs <Plug>(rust-def-split)
-au FileType rust nmap gx <Plug>(rust-def-vertical)
-au FileType rust nmap <leader>gd <Plug>(rust-doc)
-" " " " " " " " " " " " " " " " " " " " " " " " " " " " " " "
-" " " " " " " " " " " " " " " " " " " " " " " " " " " " " " "
-" Taken from https://github.com/nicknisi/vim-workshop/blob/master/vimrc
-set nocompatible " not compatible with vi
-set autoread " detect when a file is changed
+" change <ESC> to jj
+inoremap jk <ESC>
 
-" make backspace behave in a sane manner
-set backspace=indent,eol,start
 
-" set a map leader for more key combos
-let mapleader = ','
 
-" Tab control
-set noexpandtab " tabs ftw
-set smarttab " tab respects 'tabstop', 'shiftwidth', and 'softtabstop'
-set tabstop=4 " the visible width of tabs
-set softtabstop=4 " edit as if the tabs are 4 characters wide
-set shiftwidth=4 " number of spaces to use for indent and unindent
-set shiftround " round indent to a multiple of 'shiftwidth'
+" Indentations settings
+vnoremap < <gv  " Select indenetation
+vnoremap > >gv  " Same as above
 
-set clipboard=unnamed
+" Enable folding with sapcebar
+nnoremap <space> za
 
-" faster redrawing
-set ttyfast
+" For local replace
+nnoremap gr gd[{V%::s/<C-R>///gc<left><left><left>
 
-" code folding settings
-set foldmethod=syntax " fold based on indent
-set foldnestmax=10 " deepest fold is 10 levels
-set nofoldenable " don't fold by default
-set foldlevel=1
+" For global replace
+nnoremap gR gD:%s/<C-R>///gc<left><left><left>
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => User Interface
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" Searching
-set ignorecase " case insensitive searching
-set smartcase " case-sensitive if expresson contains a capital letter
-set hlsearch
-set incsearch " set incremental search, like modern browsers
-set nolazyredraw " don't redraw while executing macros
-
-set magic " Set magic on, for regex
-
-set showmatch " show matching braces
-set mat=2 " how many tenths of a second to blink
-
-" switch syntax highlighting on
-syntax on
-
-set encoding=utf8
-let base16colorspace=256  " Access colors present in 256 colorspace"
-set t_Co=256 " Explicitly tell vim that the terminal supports 256 colors"
-set background=dark
-colorscheme delek
-
-set number
-
-set autoindent " automatically set indent of new line
-set smartindent
-
-set laststatus=2 " show the satus line all the time
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Mappings
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-map <leader>ev :e! ~/.vimrc<cr> " edit ~/.vimrc
-
-map <leader>wc :wincmd q<cr>
-
-" moving up and down work as you would expect
-nnoremap <silent> j gj
-nnoremap <silent> k gk
-
-" helpers for dealing with other people's code
-nmap \t :set ts=4 sts=4 sw=4 noet<cr>
-nmap \s :set ts=4 sts=4 sw=4 et<cr>
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Functions
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-map <C-h> :call WinMove('h')<cr>
-map <C-j> :call WinMove('j')<cr>
-map <C-k> :call WinMove('k')<cr>
-map <C-l> :call WinMove('l')<cr>
-
-" Window movement shortcuts
-" move to the window in the direction shown, or create a new window
-function! WinMove(key)
-    let t:curwin = winnr()
-    exec "wincmd ".a:key
-    if (t:curwin == winnr())
-        if (match(a:key,'[jk]'))
-            wincmd v
-        else
-            wincmd s
-        endif
-        exec "wincmd ".a:key
-    endif
+" Make return select in completion
+inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+function! s:my_cr_function()
+    "return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
+    " For no inserting <CR> key.
+    return pumvisible() ? "\<C-y>" : "\<CR>"
 endfunction
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Plugin settings
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" -----------------------------------------------------------------------------
+" Text settings----------------------------------------------------------------
+" -----------------------------------------------------------------------------
+" Text file format options:
+"   n - Recognize numbered lists
+"   2 - Paragraph-style indents
+augroup FORMAT_OPTIONS_TXT
+    au!
+    au BufNewFile,BufRead *.txt,*.md,*.tex setlocal fo+=n2
+augroup END
 
-" close NERDTree after a file is opened
-let g:NERDTreeQuitOnOpen=0
-" show hidden files in NERDTree
-let NERDTreeShowHidden=1
-" Toggle NERDTree
-nmap <silent> <leader>k :NERDTreeToggle<cr>
-" expand to the path of the file in the current buffer
-nmap <silent> <leader>y :NERDTreeFind<cr>
+" Enable spell check for text files
+augroup SPELLCHECK
+    au!
+    au BufNewFile,BufRead *.txt,*.tex setlocal spell
+    au Filetype markdown,help setlocal spell
+augroup END
 
-" map fuzzyfinder (CtrlP) plugin
-" nmap <silent> <leader>t :CtrlP<cr>
-nmap <silent> <leader>r :CtrlPBuffer<cr>
-let g:ctrlp_map='<leader>t'
-let g:ctrlp_dotfiles=1
-let g:ctrlp_working_path_mode = 'ra'
+"------------------------------------------------------------------------------
+" Python-----------------------------------------------------------------------
+"------------------------------------------------------------------------------
+"autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+let python_highlight_all=1
 
-" CtrlP ignore patterns
-let g:ctrlp_custom_ignore = {
-            \ 'dir': '\.git$\|node_modules$\|\.hg$\|\.svn$',
-            \ 'file': '\.exe$\|\.so$'
-            \ }
+" Jedi vim--------------------------------------------------------------------
+let g:jedi#use_splits_not_buffers = "right"
+let g:jedi#popup_on_dot = 0
+let g:jedi#popup_select_first = 0
+let g:jedi#show_call_signatures = "1"
+let g:jedi#goto_command = "\e,"
+let g:jedi#goto_assignments_command = "<leader>g"
+let g:jedi#goto_definitions_command = ""
+let g:jedi#documentation_command = "\e."
+let g:jedi#usages_command = "<leader>n"
+let g:jedi#completions_command = "<C-Space>"
+let g:jedi#rename_command = "<leader>r"
 
-" search the nearest ancestor that contains .git, .hg, .svn
-let g:ctrlp_working_path_mode = 2
+"------------------------------------------------------------------------------
+" Haskell----------------------------------------------------------------------
+"------------------------------------------------------------------------------
+au FileType haskell setl sw=2 sts=2 et omnifunc=necoghc#omnifunc
 
-" " " " " " " " " " " " " " " " " " " " " " " " " " " " " " "
-" " " " " " " " " " " " " " " " " " " " " " " " " " " " " " "
-" ends from https://github.com/nicknisi/vim-workshop/blob/master/vimrc
+" Ghc-mod----------------------------------------------------------------------
+let g:haskellmode_completion_ghc = 1
+
+map <silent> tw :GhcModTypeInsert<CR>
+map <silent> ts :GhcModSplitFunCase<CR>
+map <silent> tq :GhcModType<CR>
+map <silent> te :GhcModTypeClear<CR>
+
+"------------------------------------------------------------------------------
+" LaTeX -----------------------------------------------------------------------
+"------------------------------------------------------------------------------
+" Change auto detect of .tex to plaintex
+let g:tex_flavor = 'latex'
+
+" IndentLine-------------------------------------------------------------------
+let g:indentLine_char = '¦'
+
+" Syntastic--------------------------------------------------------------------
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+nnoremap <leader>s :SyntasticToggleMode<CR>
+
+let g:syntastic_cpp_compiler = 'clang++'
+let g:syntastic_cpp_compiler_options = ' -std=c++11'
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 0
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 1
+let g:syntastic_python_checkers = ['pyflakes']
+let g:syntastic_enable_signs = 1
+let g:syntastic_enable_balloons = 0
+let g:syntastic_enable_highlighting = 0
+
+" Autoformat-------------------------------------------------------------------
+let g:formatdef_hindent = '"hindent --indent-size 2"'
+let g:formatters_haskell = ['hindent']
+let g:formatdef_yapf = '"yapf"'
+let g:formatters_python = ['yapf']
+let g:formatterpath = [
+            \ '/home/abhinav/.local/bin',
+            \ '/home/abhinav/.cargo/bin',
+            \ '/home/abhinav/anaconda3/bin/']
+
+noremap <F3> :Autoformat<CR>
+
+fun! AutoFormatExceptPython()
+    " Separate filetypes using "\|"
+    if &ft =~ 'snippets\|python\|vim'
+        return
+    endif
+    Autoformat
+endfun
+
+au BufWrite * call AutoFormatExceptPython()
+
+" AutoPairs--------------------------------------------------------------------
+let g:AutoPairsFlyMode=0
+let g:AutoPairsShortcutBackInsert = '<C-c><C-a>'
+let g:AutoPairsShortcutJump = '%'
+
+" EasyAlign--------------------------------------------------------------------
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
+
+" Stratify---------------------------------------------------------------------
+let g:startify_list_order = ['files', 'dir', 'bookmarks', 'sessions',
+            \ 'commands']
+let g:startify_relative_path = 0
+let g:startify_files_number = 8
+let g:startify_change_to_dir = 1
+
+" Vim Polyglot-----------------------------------------------------------------
+"let g:polyglot_disabled = ['haskell', 'python']
+
+" Vim-Over---------------------------------------------------------------------
+nnoremap <silent> <bslash> <esc>:OverCommandLine<cr>%s/
+vnoremap <silent> <bslash> <esc>gv:OverCommandLine<cr>s/
+
+" Nerd Tree--------------------------------------------------------------------
+nnoremap <leader>n :NERDTreeToggle<CR>
+
+" Ultisnips-------------------------------------------------------------------
+fun! s:my_tab_expand()
+    return pumvisible() ? "\<C-k>" : <tab>
+endfun
+
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+let g:UltiSnipsEditSplit="vertical"
+
+" Super Tab-------------------------------------------------------------------
+let g:SuperTabDefaultCompletionType = "context"
+let g:SuperTabContextDefaultCompletionType = '<c-x><c-o>'
+let g:SuperTabCompletionContexts = ['s:ContextText', 's:ContextDiscover']
+let g:SuperTabContextTextOmniPrecedence = ['&omnifunc', '&completefunc']
+let g:SuperTabContextDiscoverDiscovery =
+            \ [ "&omnifunc:<c-x><c-o>","&completefunc:<c-x><c-u>"]
+let g:SuperTabLongestHighlight = 0
+let g:SuperTabNoCompleteAfter = ['^', ',', '\s']
+let g:SuperTabLongestEnhanced = 1
+let g:SuperTabClosePreviewOnPopupClose = 1
+let g:SuperTabRetainCompletionDuration = 'insert'
+
+" Neocomplete------------------------------------------------------------------
+let g:neocomplete#max_list=15
+let g:neocomplete#enable_auto_select=0
+let g:neocomplete#enable_auto_delimiter=0
+let g:neocomplete#enable_auto_close_preview=1
+let g:neocomplete#disable_auto_complete = 1
+
+execute "set <M-n>=\en"
+inoremap <M-n> <Down>
+"inoremap <M-n>  pumvisible() ? "\<Down>" : "\<C-x>\<C-u>"
+
+
+" Window management
+" Delete other windows
+nnoremap <Leader>1 <C-w>o
+
+" vertical split
+nnoremap <Leader>3 :vsplit<CR>
+
+" horizontal split
+nnoremap <Leader>2 :split<CR>
+
+" navigate open split windows
+
+nnoremap <Leader>u <C-w>k
+nnoremap <Leader><Space> <C-w>j
+nnoremap <Leader>m <C-w>l
+nnoremap <Leader>n <C-w>h
+
+" Open files
+nnoremap <leader>e :e<Space><Tab>
+
+" Quit Buffer
+nnoremap <leader>0 :q<CR>
+
+nnoremap <Leader>b :ls<CR>:b<Space>
