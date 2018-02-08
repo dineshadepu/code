@@ -319,3 +319,8 @@ https://stackoverflow.com/questions/13590976/python-make-a-video-using-several-p
     bibliography:/home/dinesh/Dropbox/Research/references.bib
     bibliographystyle:./iitbauthyr.bst
     #+END_EXAMPLE
+
+
+
+* OpenGL compiling and running
+  g++ -Wall `pkg-config --cflags glfw3` -o main window.cpp `pkg-config --static --libs glfw3`
