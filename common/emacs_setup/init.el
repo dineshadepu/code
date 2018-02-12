@@ -71,9 +71,6 @@
 ;; Electric auto pair
 (electric-pair-mode t)
 
-;; packages used in init
-(use-package dash)
-(use-package f)
 
 (setq temporary-file-directory "~/.emacs.d/tmp/")
 
@@ -140,10 +137,6 @@
   :ensure t
   :init
   (load-theme 'monokai t))
-;; (use-package zenburn-theme
-;;   :ensure t
-;;   :init
-;;   (load-theme 'zenburn t))
 
 (use-package exec-path-from-shell
   :ensure t
@@ -440,7 +433,6 @@
 ;; for org mode completion
 (setq company-begin-commands '(self-insert-command
                                org-self-insert-command c-electric-lt-gt c-electric-colon))
-
 ;;
 ;; (add-hook 'after-init-hook 'global-company-mode)
 
@@ -601,14 +593,11 @@
   :config)
 ;; (setq TeX-show-compilation t)
 
-
 (use-package elpy
   ;; :load-path "~/.emacs.d/elisp/elpy/"
   :ensure t
   :diminish elpy-mode
   :config(progn
-           (defalias 'workon 'pyvenv-workon)
-           ;; (elpy-use-cpython "~/.virtualenvs/sph/bin")
            ;; (setq elpy-rpc-python-command "python3")
            ;; (setq 'python-indent-offset 4)
            (setq company-minimum-prefix-length 1)
@@ -618,7 +607,6 @@
            ;; (elpy-use-ipython)
            ;; (elpy-clean-modeline)
            (elpy-enable)))
-(add-hook 'python-mode-hook (highlight-indentation-mode 0))
 (use-package virtualenv
   :ensure)
 (let ((virtualenv-workon-starts-python nil))
@@ -680,10 +668,16 @@
     (helm-mode 1)
     (set-face-attribute 'helm-selection nil
                         )))
+
 (use-package helm-swoop
   :ensure t
   :bind (("M-i" . helm-swoop)))
 
+(use-package helm-fuzzier
+  :ensure t)
+(require 'helm-fuzzier)
+
+(helm-fuzzier-mode 1)
 (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
 (global-set-key (kbd "M-y") 'helm-show-kill-ring)
 ;; :init
@@ -961,10 +955,6 @@
 
 ;; (setq org-ref-default-ref-type "eqref")
 ;; (org-defkey org-mode-map ["C-c M-x"] 'org-ref-helm-insert-ref-link)
-(use-package org-autolist
-  :after org
-  :config
-  (org-autolist-mode +1))
 
 (use-package doi-utils
   :after org)
@@ -1044,14 +1034,11 @@
 
 ;; org mode lateX export with reference
 (setq org-latex-pdf-process '("latexmk -pdflatex='%latex -shell-escape -interaction nonstopmode' -pdf -output-directory=%o -f %f"))
-(use-package org-bullets
-  :ensure t)
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
 ;; cdlatex mode on
-(use-package cdlatex
-  :ensure t)
-(add-hook 'org-mode-hook 'turn-on-org-cdlatex)
+;; (use-package cdlatex
+;;   :ensure t)
+;; (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
 
 
 ;; org latex classes
@@ -1079,7 +1066,7 @@
 
 (with-eval-after-load 'ox-latex
   (add-to-list 'org-latex-classes
-               '("myarticle"
+               '("article"
                  "\\documentclass{myarticle} "
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
@@ -1097,19 +1084,42 @@
                ("\\paragraph{%s}" . "\\paragraph*{%s}")
                ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
+(add-to-list 'org-latex-classes
+             '("asme2ej"
+               "\\documentclass{asme2ej} "
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 (setq org-export-latex-hyperref-format "\\ref{%s}")
 
+
+(add-to-list 'org-latex-classes
+             '("koma-article"
+               "\\documentclass{scrartcl}"
+               ("\\section{%s}" . "\\section*{%s}")
+               ("\\subsection{%s}" . "\\subsection*{%s}")
+               ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+               ("\\paragraph{%s}" . "\\paragraph*{%s}")
+               ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 ;; (setq org-ref-completion-library 'org-ref-ivy-cite)
 
 
-;; write good mode
-(use-package writegood-mode
-  :ensure t)
-(global-set-key "\C-cg" 'writegood-mode)
-(global-set-key "\C-c\C-gg" 'writegood-grade-level)
-(global-set-key "\C-c\C-ge" 'writegood-reading-ease)
 (setq org-clock-persist 'history)
 (org-clock-persistence-insinuate)
+
+;; Latex scripts highlight
+(setq org-highlight-latex-and-related '(latex))
+
+;; mode specific keys. Org refer a name and label keys shadowing
+(add-hook 'org-mode-hook ;; guessing
+          '(lambda ()
+             (local-set-key "\C-cr" 'org-ref-helm-insert-ref-link)
+             (local-set-key "\C-ci" 'org-ref-helm-insert-label-link)))
+
+;; to get user preferred labels
+(setq org-latex-prefer-user-labels t)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;      ORG-MODE ends    ;;;;;;;;;;;;;;;;;;;;;;;
@@ -1231,24 +1241,6 @@
                         '(("\\<load\\>". font-lock-keyword-face)
                           ("\\<clear\\>". font-lock-keyword-face)))
 (autoload 'run-octave "octave-inf" nil t)
-;; julia mode
-(use-package julia-mode
-  :ensure t)
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(elpy-modules
-   (quote
-    (elpy-module-company elpy-module-eldoc elpy-module-flymake elpy-module-pyvenv elpy-module-yasnippet elpy-module-django elpy-module-sane-defaults)))
- '(package-selected-packages
-   (quote
-    (julia-mode julia company-cmake writegood-mode which-key virtualenv vimrc-mode use-package toml-mode smex smartparens rg restart-emacs rainbow-delimiters racer py-yapf powerline ox-reveal org-ref org-bullets ob-ipython neotree monokai-theme markdown-mode irony-eldoc htmlize helm-swoop helm-make google-c-style golden-ratio ggtags fzf flycheck-rust flycheck-package flycheck-irony flx-ido exec-path-from-shell evil-terminal-cursor-changer evil-nerd-commenter evil-magit evil-leader elpy dired-details counsel-gtags company-statistics company-irony-c-headers company-c-headers color-theme clang-format cdlatex cargo avy auctex aggressive-indent))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+
+;;; init.el ends here
